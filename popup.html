@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Tracker</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Website Tracker</h1>
+    
+    <div class="section">
+      <h2>Current Site Info</h2>
+      <div id="current-url" class="info-text">Loading...</div>
+      <div id="current-cookies" class="info-text">Loading cookies...</div>
+    </div>
+
+    <div class="section">
+      <h2>Features</h2>
+      
+      <div class="feature-toggle">
+        <label class="switch">
+          <input type="checkbox" id="tracking-toggle">
+          <span class="slider"></span>
+        </label>
+        <span class="feature-label">Website Tracking</span>
+      </div>
+
+      <div class="feature-toggle">
+        <label class="switch">
+          <input type="checkbox" id="cookie-management-toggle">
+          <span class="slider"></span>
+        </label>
+        <span class="feature-label">Cookie Management</span>
+      </div>
+
+      <div class="feature-toggle">
+        <label class="switch">
+          <input type="checkbox" id="url-params-toggle">
+          <span class="slider"></span>
+        </label>
+        <span class="feature-label">URL Parameter Tracking</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Actions</h2>
+      <button id="clear-cookies" class="action-btn">Clear Cookies</button>
+      <button id="export-data" class="action-btn">Export Data</button>
+      <button id="view-history" class="action-btn">View History</button>
+    </div>
+
+    <div class="section" id="history-section" style="display: none;">
+      <h2>Visited Sites</h2>
+      <div id="site-list"></div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
