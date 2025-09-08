@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  // Initialize popup
   await loadCurrentSiteInfo();
   await loadFeatureStates();
   setupEventListeners();

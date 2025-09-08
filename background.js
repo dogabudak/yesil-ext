@@ -11,7 +11,6 @@ chrome.runtime.onInstalled.addListener(async () => {
     urlParamsEnabled: true
   });
   
-  // Initialize storage
   const data = await chrome.storage.local.get(['visitHistory', 'cookieHistory']);
   if (!data.visitHistory) {
     await chrome.storage.local.set({ visitHistory: [] });
@@ -21,7 +20,6 @@ chrome.runtime.onInstalled.addListener(async () => {
   }
 });
 
-// Listen for messages from content scripts and popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   switch (request.action) {
     case 'trackVisit':
@@ -55,17 +53,14 @@ async function handleTrackVisit(visitData) {
     const data = await chrome.storage.local.get(['visitHistory']);
     const history = data.visitHistory || [];
     
-    // Add new visit
     history.push(visitData);
     
-    // Keep only last 1000 visits to prevent storage overflow
     if (history.length > 1000) {
       history.splice(0, history.length - 1000);
     }
     
     await chrome.storage.local.set({ visitHistory: history });
     
-    // Log visit (for debugging)
     console.log('Tracked visit:', visitData.url);
   } catch (error) {
     console.error('Error tracking visit:', error);
