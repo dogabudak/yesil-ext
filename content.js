@@ -142,43 +142,90 @@ setInterval(() => {
   }
 }, 1000);
 
-async function loadWebsiteData() {
-  if (websiteData) return websiteData;
-  // TODO this should come from database 
+async function getCompanyByDomain(domain) {
   try {
-    const response = await fetch(chrome.runtime.getURL('data/data.json'));
-    websiteData = await response.json();
-    return websiteData;
+    // Check domain-specific cache first
+    const cacheKey = `company_${domain}`;
+    const cachedCompany = await getDomainCachedData(cacheKey);
+    if (cachedCompany) {
+      console.log('Loaded company from cache:', cachedCompany.company);
+      return cachedCompany;
+    }
+    
+    // Query specific domain from API
+    const apiUrl = `${CONFIG.API_BASE_URL}${CONFIG.API_ENDPOINTS.DOMAIN_LOOKUP}/${encodeURIComponent(domain)}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT);
+    
+    const response = await fetch(apiUrl, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    
+    if (response.ok) {
+      const result = await response.json();
+      const company = result.data;
+      
+      // Cache the company data for this domain
+      await setDomainCachedData(cacheKey, company);
+      
+      if (CONFIG.LOG_API_CALLS) {
+        console.log('Loaded company from API:', company?.company || 'Not found');
+      }
+      return company;
+    } else if (response.status === 404) {
+      // Cache "not found" to avoid repeated requests
+      await setDomainCachedData(cacheKey, null);
+      console.log('Company not found for domain:', domain);
+      return null;
+    } else {
+      throw new Error(`API request failed: ${response.status}`);
+    }
+  } catch (apiError) {
+    console.error('API request failed:', apiError.message);
+    return null;
+  }
+}
+
+async function getDomainCachedData(cacheKey) {
+  try {
+    const result = await chrome.storage.local.get([cacheKey, `${cacheKey}_time`]);
+    const cached = result[cacheKey];
+    const cacheTime = result[`${cacheKey}_time`];
+    
+    if (cached !== undefined && cacheTime) {
+      const age = Date.now() - cacheTime;
+      if (age < CONFIG.CACHE_DURATION) {
+        return cached; // Return cached data (could be null for "not found")
+      }
+    }
   } catch (error) {
-    console.error('Error loading website data:', error);
-    return [];
+    console.error('Error reading domain cache:', error);
+  }
+  return undefined; // Not cached or expired
+}
+
+async function setDomainCachedData(cacheKey, data) {
+  try {
+    await chrome.storage.local.set({
+      [cacheKey]: data, // Store the data (null if not found)
+      [`${cacheKey}_time`]: Date.now()
+    });
+  } catch (error) {
+    console.error('Error setting domain cache:', error);
   }
 }
 
 async function checkWebsiteAndShowInfo() {
-  console.log('Checking website for popup...', location.hostname);
-  const data = await loadWebsiteData();
-  console.log('Website data loaded:', data?.length, 'entries');
-  
-  if (!Array.isArray(data) || data.length === 0) {
-    console.log('No website data available');
-    return;
-  }
-
   const currentDomain = location.hostname.replace('www.', '');
-  console.log('Current domain:', currentDomain);
+  console.log('Checking website for popup...', currentDomain);
   
-  const matchedWebsite = data.find(site => {
-    const matches = currentDomain.includes(site.domain) || site.domain.includes(currentDomain);
-    console.log(`Checking ${site.domain} against ${currentDomain}:`, matches);
-    return matches;
-  });
-
-  if (matchedWebsite) {
-    console.log('Matched website found:', matchedWebsite.company);
-    createWebsiteInfoPopup(matchedWebsite);
+  // Query specific domain from database
+  const companyData = await getCompanyByDomain(currentDomain);
+  
+  if (companyData) {
+    console.log('Company found:', companyData.company);
+    createWebsiteInfoPopup(companyData);
   } else {
-    console.log('No matching website found');
+    console.log('No company data found for domain:', currentDomain);
   }
 }
 
