@@ -213,6 +213,61 @@ async function setDomainCachedData(cacheKey, data) {
   }
 }
 
+// Sample carbon neutral alternatives data
+const CARBON_NEUTRAL_ALTERNATIVES = {
+  // E-commerce
+  'amazon.com': [
+    { name: 'Ecosia Shop', url: 'https://shop.ecosia.org', description: 'Tree-planting search engine marketplace' },
+    { name: 'Package Free Shop', url: 'https://packagefreeshop.com', description: 'Zero-waste products' },
+    { name: 'Grove Collaborative', url: 'https://grove.co', description: 'Sustainable home products' }
+  ],
+  
+  // Search engines
+  'google.com': [
+    { name: 'Ecosia', url: 'https://ecosia.org', description: 'Search engine that plants trees' },
+    { name: 'DuckDuckGo', url: 'https://duckduckgo.com', description: 'Privacy-focused search with carbon neutral hosting' }
+  ],
+  
+  // Social media
+  'facebook.com': [
+    { name: 'Mastodon', url: 'https://mastodon.social', description: 'Decentralized social network with green hosting' },
+    { name: 'Diaspora', url: 'https://diasporafoundation.org', description: 'Distributed social network' }
+  ],
+  
+  // Video streaming
+  'youtube.com': [
+    { name: 'Peertube', url: 'https://joinpeertube.org', description: 'Decentralized video platform' },
+    { name: 'Vimeo', url: 'https://vimeo.com', description: 'Video platform with sustainability commitments' }
+  ],
+  
+  // Transportation
+  'uber.com': [
+    { name: 'BlaBlaCar', url: 'https://blablacar.com', description: 'Carpooling to reduce emissions' },
+    { name: 'Citymapper', url: 'https://citymapper.com', description: 'Public transport planning' }
+  ],
+  
+  // Travel
+  'booking.com': [
+    { name: 'BookDifferent', url: 'https://bookdifferent.com', description: 'Sustainable travel bookings' },
+    { name: 'Fair Trip', url: 'https://fairtrip.com', description: 'Eco-friendly accommodation' }
+  ],
+  
+  // Default alternatives for unknown sites
+  'default': [
+    { name: 'Ecosia', url: 'https://ecosia.org', description: 'Search engine that plants trees with every search' },
+    { name: 'DuckDuckGo', url: 'https://duckduckgo.com', description: 'Privacy-focused search with carbon neutral hosting' },
+    { name: 'Package Free Shop', url: 'https://packagefreeshop.com', description: 'Zero-waste and sustainable products' }
+  ]
+};
+
+function getCarbonNeutralAlternatives(domain) {
+  // Remove www. prefix and get base domain
+  const cleanDomain = domain.replace('www.', '');
+  
+  // Return specific alternatives or default ones
+  return CARBON_NEUTRAL_ALTERNATIVES[cleanDomain] || CARBON_NEUTRAL_ALTERNATIVES['default'];
+}
+
 async function checkWebsiteAndShowInfo() {
   const currentDomain = location.hostname.replace('www.', '');
   console.log('Checking website for popup...', currentDomain);
@@ -237,6 +292,43 @@ function createWebsiteInfoPopup(companyInfo) {
 
   const sustainabilityColor = companyInfo.carbon_neutral ? '#28a745' : '#dc3545';
   
+  // Get carbon neutral alternatives if the company is not carbon neutral
+  let alternativesHtml = '';
+  if (!companyInfo.carbon_neutral) {
+    const alternatives = getCarbonNeutralAlternatives(companyInfo.domain || location.hostname);
+    alternativesHtml = `
+      <div style="margin: 10px 0; padding: 8px; background: #e8f5e8; border-radius: 5px; border-left: 3px solid #28a745;">
+        <div style="display: flex; align-items: center; margin-bottom: 8px;">
+          <div style="width: 8px; height: 8px; border-radius: 50%; background: #28a745; margin-right: 6px;"></div>
+          <strong style="font-size: 12px; color: #155724;">🌱 Carbon Neutral Alternatives</strong>
+        </div>
+        <div style="font-size: 10px; color: #155724; margin-bottom: 8px;">
+          Consider these eco-friendly alternatives:
+        </div>
+        ${alternatives.map(alt => `
+          <div style="margin-bottom: 6px; padding: 6px; background: white; border-radius: 4px; border: 1px solid #d4edda;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="flex: 1;">
+                <div style="font-weight: bold; font-size: 11px; color: #155724;">${alt.name}</div>
+                <div style="font-size: 9px; color: #6c757d; margin-top: 2px;">${alt.description}</div>
+              </div>
+              <a href="${alt.url}" target="_blank" style="
+                background: #28a745;
+                color: white;
+                text-decoration: none;
+                padding: 4px 8px;
+                border-radius: 3px;
+                font-size: 9px;
+                margin-left: 8px;
+                font-weight: bold;
+              ">Visit</a>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+  
   const popup = document.createElement('div');
   popup.id = 'website-info-popup';
   popup.innerHTML = `
@@ -252,8 +344,8 @@ function createWebsiteInfoPopup(companyInfo) {
       z-index: 10000;
       font-family: Arial, sans-serif;
       text-align: left;
-      width: 300px;
-      max-height: 400px;
+      width: 320px;
+      max-height: 500px;
       overflow-y: auto;
     ">
       <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 10px;">
@@ -292,6 +384,8 @@ function createWebsiteInfoPopup(companyInfo) {
           ${companyInfo.renewable_share_percent ? `<div>Renewable: ${companyInfo.renewable_share_percent}%</div>` : ''}
         </div>
       </div>
+
+      ${alternativesHtml}
 
       ${companyInfo.data_confidence ? `<div style="font-size: 10px; color: #666; font-style: italic; margin-top: 8px;">Data confidence: ${companyInfo.data_confidence}</div>` : ''}
     </div>
