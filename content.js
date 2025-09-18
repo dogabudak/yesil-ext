@@ -162,15 +162,14 @@ async function getCompanyByDomain(domain) {
     
     if (response.ok) {
       const result = await response.json();
-      const company = result.data;
       
       // Cache the company data for this domain
-      await setDomainCachedData(cacheKey, company);
+      await setDomainCachedData(cacheKey, result);
       
       if (CONFIG.LOG_API_CALLS) {
-        console.log('Loaded company from API:', company?.company || 'Not found');
+        console.log('Loaded company from API:', result?.company || 'Not found');
       }
-      return company;
+      return result;
     } else if (response.status === 404) {
       // Cache "not found" to avoid repeated requests
       await setDomainCachedData(cacheKey, null);
