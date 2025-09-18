@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadFeatureStates();
   setupEventListeners();
 });
-
+// TODO create a flow where user can define if this popup pops up on every website or only on specific websites (like not carbon neutral websites)
 async function loadCurrentSiteInfo() {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });

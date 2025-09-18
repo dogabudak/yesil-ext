@@ -6,7 +6,8 @@
       "Bash(python3:*)",
       "Bash(python manage.py:*)",
       "Bash(curl:*)",
-      "Bash(lsof:*)"
+      "Bash(lsof:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

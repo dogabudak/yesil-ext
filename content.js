@@ -144,12 +144,12 @@ setInterval(() => {
 
 async function getCompanyByDomain(domain) {
   try {
-    // Check domain-specific cache first
     const cacheKey = `company_${domain}`;
     const cachedCompany = await getDomainCachedData(cacheKey);
     if (cachedCompany) {
       console.log('Loaded company from cache:', cachedCompany.company);
-      return cachedCompany;
+      // TODO enable this if this is prod, disable for dev
+      // return cachedCompany;
     }
     
     // Query specific domain from API
@@ -159,10 +159,9 @@ async function getCompanyByDomain(domain) {
     
     const response = await fetch(apiUrl, { signal: controller.signal });
     clearTimeout(timeoutId);
-    
+    console.log('Loaded company from API:', response);
     if (response.ok) {
       const result = await response.json();
-      
       // Cache the company data for this domain
       await setDomainCachedData(cacheKey, result);
       
@@ -213,59 +212,11 @@ async function setDomainCachedData(cacheKey, data) {
   }
 }
 
-// Sample carbon neutral alternatives data
-const CARBON_NEUTRAL_ALTERNATIVES = {
-  // E-commerce
-  'amazon.com': [
-    { name: 'Ecosia Shop', url: 'https://shop.ecosia.org', description: 'Tree-planting search engine marketplace' },
-    { name: 'Package Free Shop', url: 'https://packagefreeshop.com', description: 'Zero-waste products' },
-    { name: 'Grove Collaborative', url: 'https://grove.co', description: 'Sustainable home products' }
-  ],
-  
-  // Search engines
-  'google.com': [
-    { name: 'Ecosia', url: 'https://ecosia.org', description: 'Search engine that plants trees' },
-    { name: 'DuckDuckGo', url: 'https://duckduckgo.com', description: 'Privacy-focused search with carbon neutral hosting' }
-  ],
-  
-  // Social media
-  'facebook.com': [
-    { name: 'Mastodon', url: 'https://mastodon.social', description: 'Decentralized social network with green hosting' },
-    { name: 'Diaspora', url: 'https://diasporafoundation.org', description: 'Distributed social network' }
-  ],
-  
-  // Video streaming
-  'youtube.com': [
-    { name: 'Peertube', url: 'https://joinpeertube.org', description: 'Decentralized video platform' },
-    { name: 'Vimeo', url: 'https://vimeo.com', description: 'Video platform with sustainability commitments' }
-  ],
-  
-  // Transportation
-  'uber.com': [
-    { name: 'BlaBlaCar', url: 'https://blablacar.com', description: 'Carpooling to reduce emissions' },
-    { name: 'Citymapper', url: 'https://citymapper.com', description: 'Public transport planning' }
-  ],
-  
-  // Travel
-  'booking.com': [
-    { name: 'BookDifferent', url: 'https://bookdifferent.com', description: 'Sustainable travel bookings' },
-    { name: 'Fair Trip', url: 'https://fairtrip.com', description: 'Eco-friendly accommodation' }
-  ],
-  
-  // Default alternatives for unknown sites
-  'default': [
-    { name: 'Ecosia', url: 'https://ecosia.org', description: 'Search engine that plants trees with every search' },
-    { name: 'DuckDuckGo', url: 'https://duckduckgo.com', description: 'Privacy-focused search with carbon neutral hosting' },
-    { name: 'Package Free Shop', url: 'https://packagefreeshop.com', description: 'Zero-waste and sustainable products' }
-  ]
-};
-
-function getCarbonNeutralAlternatives(domain) {
-  // Remove www. prefix and get base domain
-  const cleanDomain = domain.replace('www.', '');
-  
-  // Return specific alternatives or default ones
-  return CARBON_NEUTRAL_ALTERNATIVES[cleanDomain] || CARBON_NEUTRAL_ALTERNATIVES['default'];
+function getCarbonNeutralAlternatives(companyData) {
+  // Return alternatives from backend API response
+  const alternatives = companyData.carbon_neutral_alternatives || [];
+  console.log('Getting alternatives:', alternatives);
+  return alternatives;
 }
 
 async function checkWebsiteAndShowInfo() {
@@ -276,7 +227,8 @@ async function checkWebsiteAndShowInfo() {
   const companyData = await getCompanyByDomain(currentDomain);
   
   if (companyData) {
-    console.log('Company found:', companyData.company);
+    console.log('Company found:', companyData);
+    console.log('Carbon neutral alternatives:', companyData.carbon_neutral_alternatives);
     createWebsiteInfoPopup(companyData);
   } else {
     console.log('No company data found for domain:', currentDomain);
@@ -295,7 +247,8 @@ function createWebsiteInfoPopup(companyInfo) {
   // Get carbon neutral alternatives if the company is not carbon neutral
   let alternativesHtml = '';
   if (!companyInfo.carbon_neutral) {
-    const alternatives = getCarbonNeutralAlternatives(companyInfo.domain || location.hostname);
+    console.log('Getting alternatives for company:', companyInfo);
+    const alternatives = getCarbonNeutralAlternatives(companyInfo);
     alternativesHtml = `
       <div style="margin: 10px 0; padding: 8px; background: #e8f5e8; border-radius: 5px; border-left: 3px solid #28a745;">
         <div style="display: flex; align-items: center; margin-bottom: 8px;">
