@@ -195,6 +195,74 @@ input:checked + .slider:before {
   background: #999;
 }
 
+/* Product Information Styles */
+.company-info {
+  font-size: 12px;
+}
+
+.company-header h3 {
+  color: #007bff;
+  margin: 0 0 4px 0;
+  font-size: 14px;
+}
+
+.company-domain {
+  color: #666;
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+
+.company-details {
+  margin-bottom: 8px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.detail-label {
+  font-weight: bold;
+  color: #555;
+}
+
+.detail-value {
+  color: #333;
+  text-align: right;
+  flex: 1;
+  margin-left: 8px;
+}
+
+.sustainability-info {
+  background: #f8f9fa;
+  border-radius: 5px;
+  padding: 8px;
+}
+
+.sustainability-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.sustainability-label {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.sustainability-details {
+  font-size: 11px;
+  color: #555;
+}
+
 /* Responsive adjustments */
 @media (max-height: 400px) {
   .container {

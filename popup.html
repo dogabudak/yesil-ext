@@ -16,6 +16,41 @@
       <div id="current-cookies" class="info-text">Loading cookies...</div>
     </div>
 
+    <div class="section" id="product-info-section" style="display: none;">
+      <h2>Product Information</h2>
+      <div id="company-info" class="company-info">
+        <div class="company-header">
+          <h3 id="company-name"></h3>
+          <div id="company-domain" class="company-domain"></div>
+        </div>
+        <div class="company-details">
+          <div class="detail-row">
+            <span class="detail-label">Sector:</span>
+            <span id="company-sector" class="detail-value"></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">HQ:</span>
+            <span id="company-hq" class="detail-value"></span>
+          </div>
+          <div class="detail-row" id="country-row" style="display: none;">
+            <span class="detail-label">Country:</span>
+            <span id="company-country" class="detail-value"></span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Parent:</span>
+            <span id="company-parent" class="detail-value"></span>
+          </div>
+        </div>
+        <div class="sustainability-info">
+          <div class="sustainability-header">
+            <div id="sustainability-status" class="status-indicator"></div>
+            <span class="sustainability-label">Sustainability</span>
+          </div>
+          <div id="sustainability-details" class="sustainability-details"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="section">
       <h2>Features</h2>
       
@@ -57,6 +92,7 @@
     </div>
   </div>
 
+  <script src="config.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
