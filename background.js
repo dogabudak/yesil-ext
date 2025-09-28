@@ -8,7 +8,8 @@ chrome.runtime.onInstalled.addListener(async () => {
   await chrome.storage.sync.set({
     trackingEnabled: true,
     cookieManagementEnabled: true,
-    urlParamsEnabled: true
+    urlParamsEnabled: true,
+    alwaysOnEnabled: false
   });
   
   const data = await chrome.storage.local.get(['visitHistory', 'cookieHistory']);

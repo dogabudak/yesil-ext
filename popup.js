@@ -178,12 +178,14 @@ async function loadFeatureStates() {
   const settings = await chrome.storage.sync.get({
     trackingEnabled: true,
     cookieManagementEnabled: true,
-    urlParamsEnabled: true
+    urlParamsEnabled: true,
+    alwaysOnEnabled: false
   });
   
   document.getElementById('tracking-toggle').checked = settings.trackingEnabled;
   document.getElementById('cookie-management-toggle').checked = settings.cookieManagementEnabled;
   document.getElementById('url-params-toggle').checked = settings.urlParamsEnabled;
+  document.getElementById('always-on-toggle').checked = settings.alwaysOnEnabled;
 }
 
 function setupEventListeners() {
@@ -199,6 +201,11 @@ function setupEventListeners() {
   
   document.getElementById('url-params-toggle').addEventListener('change', async (e) => {
     await chrome.storage.sync.set({ urlParamsEnabled: e.target.checked });
+  });
+  
+  document.getElementById('always-on-toggle').addEventListener('change', async (e) => {
+    await chrome.storage.sync.set({ alwaysOnEnabled: e.target.checked });
+    chrome.runtime.sendMessage({ action: 'toggleAlwaysOn', enabled: e.target.checked });
   });
   
   // Action buttons

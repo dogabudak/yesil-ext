@@ -154,6 +154,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       });
       break;
       
+    case 'toggleAlwaysOn':
+      // Re-check website info when always-on toggle changes
+      checkWebsiteAndShowInfo();
+      sendResponse({ success: true });
+      break;
+      
     default:
       sendResponse({ error: 'Unknown action' });
   }
@@ -257,6 +263,9 @@ async function checkWebsiteAndShowInfo() {
   const currentDomain = location.hostname.replace('www.', '');
   console.log('Checking website for popup...', currentDomain);
   
+  // Check if always-on mode is enabled
+  const settings = await chrome.storage.sync.get({ alwaysOnEnabled: false });
+  
   // Query specific domain from database
   const companyData = await getCompanyByDomain(currentDomain);
   
@@ -264,6 +273,9 @@ async function checkWebsiteAndShowInfo() {
     console.log('Company found:', companyData);
     console.log('Carbon neutral alternatives:', companyData.carbon_neutral_alternatives);
     createWebsiteInfoPopup(companyData);
+  } else if (settings.alwaysOnEnabled) {
+    console.log('No company data found for domain, but always-on enabled:', currentDomain);
+    createUnknownGreenScorePopup(currentDomain);
   } else {
     console.log('No company data found for domain:', currentDomain);
   }
@@ -382,6 +394,82 @@ function createWebsiteInfoPopup(companyInfo) {
   document.body.appendChild(popup);
 
   // Add click handlers
+  document.getElementById('close-popup').onclick = () => {
+    popup.remove();
+  };
+}
+
+function createUnknownGreenScorePopup(domain) {
+  // Remove existing popup if any
+  const existingPopup = document.getElementById('website-info-popup');
+  if (existingPopup) {
+    existingPopup.remove();
+  }
+
+  const popup = document.createElement('div');
+  popup.id = 'website-info-popup';
+  popup.innerHTML = `
+    <div style="
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      border: 2px solid #ffc107;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      z-index: 10000;
+      font-family: Arial, sans-serif;
+      text-align: left;
+      width: 320px;
+      max-height: 500px;
+      overflow-y: auto;
+    ">
+      <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 10px;">
+        <div style="flex: 1;">
+          <h3 style="color: #856404; margin: 0; font-size: 16px;">${domain}</h3>
+          <p style="margin: 2px 0; color: #666; font-size: 12px;">Website or Product</p>
+        </div>
+        <button id="close-popup" style="
+          background: #ccc;
+          color: #333;
+          border: none;
+          border-radius: 50%;
+          width: 25px;
+          height: 25px;
+          cursor: pointer;
+          font-size: 14px;
+          margin-left: 10px;
+        ">✕</button>
+      </div>
+      
+      <div style="margin: 10px 0; padding: 8px; background: #fff3cd; border-radius: 5px; border-left: 3px solid #ffc107;">
+        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+          <div style="width: 8px; height: 8px; border-radius: 50%; background: #ffc107; margin-right: 6px;"></div>
+          <strong style="font-size: 12px; color: #856404;">Green Score</strong>
+        </div>
+        <div style="font-size: 11px; color: #856404;">
+          <div>🔍 Unknown - Information not available</div>
+          <div style="margin-top: 5px; font-style: italic;">We don't have sustainability data for this website yet.</div>
+        </div>
+      </div>
+
+      <div style="margin: 10px 0; padding: 8px; background: #d1ecf1; border-radius: 5px; border-left: 3px solid #bee5eb;">
+        <div style="font-size: 10px; color: #0c5460;">
+          <div style="margin-bottom: 5px;"><strong>💡 Help us improve:</strong></div>
+          <div>If you know about this company's sustainability practices, consider contributing to our database.</div>
+        </div>
+      </div>
+
+      <div style="font-size: 10px; color: #666; font-style: italic; margin-top: 8px;">
+        Always-on mode is enabled
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(popup);
+
+  // Add click handler for close button
   document.getElementById('close-popup').onclick = () => {
     popup.remove();
   };
