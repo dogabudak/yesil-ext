@@ -19,7 +19,7 @@ body {
 h1 {
   font-size: 18px;
   color: #333;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   text-align: center;
   border-bottom: 2px solid #4CAF50;
   padding-bottom: 8px;
@@ -263,19 +263,328 @@ input:checked + .slider:before {
   color: #555;
 }
 
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  color: #666;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+
+.tab-btn:hover {
+  color: #4CAF50;
+  background: rgba(76, 175, 80, 0.05);
+}
+
+.tab-btn.active {
+  color: #4CAF50;
+  border-bottom-color: #4CAF50;
+}
+
+/* Tab Content */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Account Tab Styles */
+.account-view {
+  padding: 8px 0;
+}
+
+.account-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.account-header h2 {
+  font-size: 20px;
+  color: #1a1a1a;
+  margin-bottom: 6px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.account-subtitle {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Social Login Buttons */
+.social-login-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.social-login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.social-login-btn:hover {
+  background: #f8f8f8;
+  border-color: #ccc;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.social-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.google-btn {
+  color: #1a1a1a;
+}
+
+.facebook-btn {
+  color: #1a1a1a;
+}
+
+.apple-btn {
+  background: #000;
+  color: white;
+  border-color: #000;
+}
+
+.apple-btn:hover {
+  background: #333;
+  border-color: #333;
+}
+
+.github-btn {
+  background: #24292e;
+  color: white;
+  border-color: #24292e;
+}
+
+.github-btn:hover {
+  background: #2f363d;
+  border-color: #2f363d;
+}
+
+/* Divider */
+.login-divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  gap: 12px;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: #e0e0e0;
+}
+
+.divider-text {
+  color: #999;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+/* Email Login Form */
+.email-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+}
+
+.login-submit-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background: linear-gradient(145deg, #4CAF50, #45a049);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+
+.login-submit-btn:hover {
+  background: linear-gradient(145deg, #45a049, #4CAF50);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Login Footer */
+.login-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.login-link {
+  color: #4CAF50;
+  font-size: 12px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.login-link:hover {
+  color: #45a049;
+  text-decoration: underline;
+}
+
+.login-separator {
+  color: #ccc;
+  font-size: 12px;
+}
+
+/* Logout Button */
+.logout-btn {
+  background: linear-gradient(145deg, #dc3545, #c82333);
+  width: 100%;
+}
+
+.logout-btn:hover {
+  background: linear-gradient(145deg, #c82333, #dc3545);
+}
+
+/* Profile Section */
+.profile-section {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.profile-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #4CAF50, #45a049);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-info h3 {
+  font-size: 16px;
+  color: #1a1a1a;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-info p {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-details {
+  margin-bottom: 16px;
+}
+
+.profile-details .detail-row {
+  margin-bottom: 8px;
+}
+
+.profile-actions {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e0;
+}
+
 /* Responsive adjustments */
 @media (max-height: 400px) {
   .container {
     padding: 8px;
   }
-  
+
   .section {
     padding: 8px;
     margin-bottom: 8px;
   }
-  
+
   h1 {
     font-size: 16px;
     margin-bottom: 8px;
+  }
+
+  .login-container {
+    min-height: auto;
+    padding: 16px;
   }
 }

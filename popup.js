@@ -1,8 +1,199 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  setupTabNavigation();
+  await checkAuthState();
   await loadCurrentSiteInfo();
   await loadFeatureStates();
   setupEventListeners();
+  setupLoginListeners();
 });
+
+// Tab Navigation
+function setupTabNavigation() {
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const tabName = button.getAttribute('data-tab');
+
+      // Remove active class from all tabs
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+
+      // Add active class to clicked tab
+      button.classList.add('active');
+      document.getElementById(`${tabName}-tab`).classList.add('active');
+    });
+  });
+}
+
+// TODO: Implement authentication state management
+// - Store authentication tokens securely in chrome.storage
+// - Validate tokens on startup
+// - Handle token expiration and refresh
+async function checkAuthState() {
+  try {
+    // TODO: Check if user has valid authentication token
+    const authData = await chrome.storage.local.get(['authToken', 'userEmail', 'authProvider', 'authTimestamp']);
+
+    if (authData.authToken) {
+      // TODO: Validate token with backend API
+      // TODO: Check token expiration
+      showProfileView(authData);
+    } else {
+      showLoginView();
+    }
+  } catch (error) {
+    console.error('Error checking auth state:', error);
+    showLoginView();
+  }
+}
+
+function showLoginView() {
+  document.getElementById('account-login-view').style.display = 'block';
+  document.getElementById('account-profile-view').style.display = 'none';
+}
+
+function showProfileView(authData) {
+  document.getElementById('account-login-view').style.display = 'none';
+  document.getElementById('account-profile-view').style.display = 'block';
+
+  // Update profile information
+  const email = authData.userEmail || 'user@example.com';
+  const provider = authData.authProvider || 'email';
+
+  // Set avatar initial
+  const initial = email.charAt(0).toUpperCase();
+  document.getElementById('profile-avatar-text').textContent = initial;
+
+  // Set profile details
+  document.getElementById('profile-name').textContent = email.split('@')[0];
+  document.getElementById('profile-email').textContent = email;
+  document.getElementById('profile-provider').textContent = provider.charAt(0).toUpperCase() + provider.slice(1);
+
+  // Set member since date
+  if (authData.authTimestamp) {
+    const memberDate = new Date(authData.authTimestamp).toLocaleDateString();
+    document.getElementById('profile-member-since').textContent = memberDate;
+  }
+}
+
+// TODO: Implement social login handlers
+function setupLoginListeners() {
+  // Google Login
+  document.getElementById('google-login-btn').addEventListener('click', async () => {
+    // TODO: Implement Google OAuth2 flow
+    // 1. Use chrome.identity.launchWebAuthFlow for OAuth
+    // 2. Get authorization code
+    // 3. Exchange code for access token with backend
+    // 4. Store token and user info
+    // 5. Call showAppScreen()
+    console.log('Google login clicked');
+    // Temporary: auto-login for development
+    await handleMockLogin('google', 'user@gmail.com');
+  });
+
+  // Facebook Login
+  document.getElementById('facebook-login-btn').addEventListener('click', async () => {
+    // TODO: Implement Facebook OAuth2 flow
+    // 1. Use chrome.identity.launchWebAuthFlow for OAuth
+    // 2. Get authorization code
+    // 3. Exchange code for access token with backend
+    // 4. Store token and user info
+    // 5. Call showAppScreen()
+    console.log('Facebook login clicked');
+    await handleMockLogin('facebook', 'user@facebook.com');
+  });
+
+  // Apple Login
+  document.getElementById('apple-login-btn').addEventListener('click', async () => {
+    // TODO: Implement Apple Sign In flow
+    // 1. Use chrome.identity.launchWebAuthFlow for OAuth
+    // 2. Get authorization code
+    // 3. Exchange code for access token with backend
+    // 4. Store token and user info
+    // 5. Call showAppScreen()
+    console.log('Apple login clicked');
+    await handleMockLogin('apple', 'user@apple.com');
+  });
+
+  // GitHub Login
+  document.getElementById('github-login-btn').addEventListener('click', async () => {
+    // TODO: Implement GitHub OAuth2 flow
+    // 1. Use chrome.identity.launchWebAuthFlow for OAuth
+    // 2. Get authorization code
+    // 3. Exchange code for access token with backend
+    // 4. Store token and user info
+    // 5. Call showAppScreen()
+    console.log('GitHub login clicked');
+    await handleMockLogin('github', 'user@github.com');
+  });
+
+  // Email/Password Login
+  document.getElementById('email-login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email-input').value;
+    const password = document.getElementById('password-input').value;
+
+    // TODO: Implement email/password authentication
+    // 1. Send credentials to backend API
+    // 2. Receive and validate JWT token
+    // 3. Store token securely in chrome.storage
+    // 4. Store user info (email, name, etc.)
+    // 5. Call showAppScreen()
+    console.log('Email login submitted:', email);
+    await handleMockLogin('email', email);
+  });
+
+  // Forgot Password
+  document.getElementById('forgot-password-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    // TODO: Implement password reset flow
+    // 1. Show password reset form/modal
+    // 2. Send reset email via backend API
+    // 3. Handle reset token validation
+    console.log('Forgot password clicked');
+    alert('Password reset functionality - TODO: Implement');
+  });
+
+  // Create Account
+  document.getElementById('create-account-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    // TODO: Implement account creation flow
+    // 1. Show registration form/modal
+    // 2. Collect user information
+    // 3. Create account via backend API
+    // 4. Auto-login after successful registration
+    console.log('Create account clicked');
+    alert('Account creation functionality - TODO: Implement');
+  });
+}
+
+// TODO: Remove this mock function and implement real authentication
+async function handleMockLogin(provider, email) {
+  // This is a temporary mock function for development/testing
+  // Replace with real authentication implementation
+  try {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Store mock auth data
+    const authData = {
+      authToken: 'mock_token_' + Date.now(),
+      userEmail: email,
+      authProvider: provider,
+      authTimestamp: Date.now()
+    };
+
+    await chrome.storage.local.set(authData);
+
+    // Update the account tab to show profile
+    showProfileView(authData);
+  } catch (error) {
+    console.error('Mock login error:', error);
+    alert('Login failed. Please try again.');
+  }
+}
 
 function getCountryEmoji(countryCode) {
   if (!countryCode || countryCode.length !== 2) return '';
@@ -212,6 +403,43 @@ function setupEventListeners() {
   document.getElementById('clear-cookies').addEventListener('click', clearCookies);
   document.getElementById('export-data').addEventListener('click', exportData);
   document.getElementById('view-history').addEventListener('click', toggleHistory);
+
+  // Logout button (only if it exists - it's in the account tab)
+  const logoutBtn = document.getElementById('logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', handleLogout);
+  }
+}
+
+// TODO: Implement proper logout functionality
+async function handleLogout() {
+  try {
+    // TODO: Implement complete logout flow
+    // 1. Invalidate token on backend server
+    // 2. Clear authentication data from storage
+    // 3. Clear any cached user data
+    // 4. Optionally revoke OAuth tokens with providers
+    // 5. Return to login screen
+
+    // Clear auth data from storage
+    await chrome.storage.local.remove(['authToken', 'userEmail', 'authProvider', 'authTimestamp']);
+
+    // TODO: Call backend API to invalidate session
+    // await fetch(API_URL + '/logout', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Authorization': 'Bearer ' + authToken
+    //   }
+    // });
+
+    // Show login view in account tab
+    showLoginView();
+  } catch (error) {
+    console.error('Logout error:', error);
+    // Even if there's an error, clear local data and show login
+    await chrome.storage.local.remove(['authToken', 'userEmail', 'authProvider', 'authTimestamp']);
+    showLoginView();
+  }
 }
 
 async function clearCookies() {
