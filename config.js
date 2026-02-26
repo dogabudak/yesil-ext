@@ -23,7 +23,7 @@ const CONFIG = {
   RETRY_ATTEMPTS: 2,
   
   // Development settings
-  DEBUG_MODE: false,
+  DEBUG_MODE: true,
   LOG_API_CALLS: true
 };
 

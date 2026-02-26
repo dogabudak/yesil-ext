@@ -3,121 +3,152 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Website Tracker</title>
+  <title>Green Score</title>
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="container">
-    <h1>Website Tracker</h1>
+    <!-- Header -->
+    <div class="header">
+      <div class="header-icon">🌿</div>
+      <h1>Green Score</h1>
+    </div>
 
     <!-- Tab Navigation -->
     <div class="tab-navigation">
-      <button class="tab-btn active" data-tab="tracker">Tracker</button>
+      <button class="tab-btn active" data-tab="score">Score</button>
       <button class="tab-btn" data-tab="account">Account</button>
     </div>
 
-    <!-- Tracker Tab Content -->
-    <div id="tracker-tab" class="tab-content active">
-      <div class="section">
-      <h2>Current Site Info</h2>
-      <div id="current-url" class="info-text">Loading...</div>
-      <div id="current-cookies" class="info-text">Loading cookies...</div>
-    </div>
+    <!-- Score Tab -->
+    <div id="score-tab" class="tab-content active">
+      <!-- Loading State -->
+      <div id="loading-state" class="state-view">
+        <div class="loader"></div>
+        <p class="loading-text">Checking sustainability data...</p>
+      </div>
 
-    <div class="section" id="product-info-section" style="display: none;">
-      <h2>Product Information</h2>
-      <div id="company-info" class="company-info">
-        <div class="company-header">
-          <h3 id="company-name"></h3>
-          <div id="company-domain" class="company-domain"></div>
+      <!-- Company Found -->
+      <div id="company-view" class="state-view" style="display: none;">
+        <!-- Company Hero -->
+        <div class="company-hero">
+          <div class="company-hero-top">
+            <div class="company-identity">
+              <h2 id="company-name" class="company-name"></h2>
+              <span id="company-domain" class="company-domain"></span>
+            </div>
+            <div id="country-flag" class="country-flag"></div>
+          </div>
+          <div id="carbon-badge" class="carbon-badge"></div>
         </div>
-        <div class="company-details">
-          <div class="detail-row">
-            <span class="detail-label">Sector:</span>
-            <span id="company-sector" class="detail-value"></span>
+
+        <!-- Info Cards -->
+        <div class="info-grid">
+          <div class="info-card">
+            <div class="info-card-icon">🏢</div>
+            <div class="info-card-content">
+              <span class="info-card-label">Sector</span>
+              <span id="company-sector" class="info-card-value"></span>
+            </div>
           </div>
-          <div class="detail-row">
-            <span class="detail-label">HQ:</span>
-            <span id="company-hq" class="detail-value"></span>
+          <div class="info-card">
+            <div class="info-card-icon">📍</div>
+            <div class="info-card-content">
+              <span class="info-card-label">Headquarters</span>
+              <span id="company-hq" class="info-card-value"></span>
+            </div>
           </div>
-          <div class="detail-row" id="country-row" style="display: none;">
-            <span class="detail-label">Country:</span>
-            <span id="company-country" class="detail-value"></span>
+          <div class="info-card" id="origin-card" style="display: none;">
+            <div class="info-card-icon" id="origin-flag-small"></div>
+            <div class="info-card-content">
+              <span class="info-card-label">Country of Origin</span>
+              <span id="company-origin" class="info-card-value"></span>
+            </div>
           </div>
-          <div class="detail-row">
-            <span class="detail-label">Parent:</span>
-            <span id="company-parent" class="detail-value"></span>
+          <div class="info-card" id="parent-card" style="display: none;">
+            <div class="info-card-icon">🏛️</div>
+            <div class="info-card-content">
+              <span class="info-card-label">Parent Company</span>
+              <span id="company-parent" class="info-card-value"></span>
+            </div>
           </div>
         </div>
-        <div class="sustainability-info">
-          <div class="sustainability-header">
-            <div id="sustainability-status" class="status-indicator"></div>
-            <span class="sustainability-label">Sustainability</span>
+
+        <!-- Sustainability Section -->
+        <div class="sustainability-section">
+          <h3 class="section-title">Sustainability</h3>
+          <div class="sustainability-meters">
+            <div class="meter-row">
+              <span class="meter-label">Carbon Neutral</span>
+              <span id="carbon-neutral-value" class="meter-value"></span>
+            </div>
+            <div class="meter-row" id="renewable-row" style="display: none;">
+              <span class="meter-label">Renewable Energy</span>
+              <div class="progress-bar-container">
+                <div id="renewable-bar" class="progress-bar"></div>
+              </div>
+              <span id="renewable-value" class="meter-percent"></span>
+            </div>
           </div>
-          <div id="sustainability-details" class="sustainability-details"></div>
+        </div>
+
+        <!-- Certifications Section -->
+        <div id="certifications-section" class="certifications-section" style="display: none;">
+          <h3 class="section-title">Certifications</h3>
+          <div id="certifications-list" class="certifications-list"></div>
+        </div>
+
+        <!-- Description Section -->
+        <div id="description-section" class="description-section" style="display: none;">
+          <div class="description-header">
+            <h3 class="section-title">About</h3>
+            <div id="language-selector" class="language-selector">
+              <button class="lang-btn active" data-lang="en">EN</button>
+              <button class="lang-btn" data-lang="tr">TR</button>
+              <button class="lang-btn" data-lang="de">DE</button>
+            </div>
+          </div>
+          <div id="description-content" class="description-content"></div>
+        </div>
+
+        <!-- Alternatives Section -->
+        <div id="alternatives-section" class="alternatives-section" style="display: none;">
+          <h3 class="section-title">🌱 Green Alternatives</h3>
+          <p class="alternatives-subtitle">Consider these carbon-neutral options:</p>
+          <div id="alternatives-list" class="alternatives-list"></div>
+        </div>
+
+        <!-- Data Info -->
+        <div id="data-info-row" class="data-info-row" style="display: none;">
+          <span id="data-updated-value" class="data-info-value"></span>
         </div>
       </div>
-    </div>
 
-    <div class="section">
-      <h2>Features</h2>
-      
-      <div class="feature-toggle">
-        <label class="switch">
-          <input type="checkbox" id="tracking-toggle">
-          <span class="slider"></span>
-        </label>
-        <span class="feature-label">Website Tracking</span>
+      <!-- No Data State -->
+      <div id="no-data-view" class="state-view" style="display: none;">
+        <div class="no-data-icon">🔍</div>
+        <h2 class="no-data-title">No Data Available</h2>
+        <p id="no-data-domain" class="no-data-domain"></p>
+        <p class="no-data-text">We don't have sustainability information for this website yet.</p>
       </div>
 
-      <div class="feature-toggle">
-        <label class="switch">
-          <input type="checkbox" id="cookie-management-toggle">
-          <span class="slider"></span>
-        </label>
-        <span class="feature-label">Cookie Management</span>
-      </div>
-
-      <div class="feature-toggle">
-        <label class="switch">
-          <input type="checkbox" id="url-params-toggle">
-          <span class="slider"></span>
-        </label>
-        <span class="feature-label">URL Parameter Tracking</span>
-      </div>
-
-      <div class="feature-toggle">
-        <label class="switch">
-          <input type="checkbox" id="always-on-toggle">
-          <span class="slider"></span>
-        </label>
-        <span class="feature-label">Always Show Green Score</span>
+      <!-- Error State -->
+      <div id="error-view" class="state-view" style="display: none;">
+        <div class="no-data-icon">⚠️</div>
+        <h2 class="no-data-title">Unable to Load</h2>
+        <p class="no-data-text">Could not retrieve sustainability data. Please try again later.</p>
       </div>
     </div>
 
-      <div class="section">
-        <h2>Actions</h2>
-        <button id="clear-cookies" class="action-btn">Clear Cookies</button>
-        <button id="export-data" class="action-btn">Export Data</button>
-        <button id="view-history" class="action-btn">View History</button>
-      </div>
-
-      <div class="section" id="history-section" style="display: none;">
-        <h2>Visited Sites</h2>
-        <div id="site-list"></div>
-      </div>
-    </div>
-
-    <!-- Account Tab Content -->
+    <!-- Account Tab -->
     <div id="account-tab" class="tab-content">
-      <!-- Logged Out View -->
+      <!-- Login View -->
       <div id="account-login-view" class="account-view">
         <div class="account-header">
           <h2>Sign In</h2>
           <p class="account-subtitle">Sync your data across devices and unlock premium features</p>
         </div>
 
-        <!-- Social Login Buttons -->
         <div class="social-login-section">
           <button id="google-login-btn" class="social-login-btn google-btn">
             <svg class="social-icon" viewBox="0 0 24 24">
@@ -151,14 +182,12 @@
           </button>
         </div>
 
-        <!-- Divider -->
         <div class="login-divider">
           <span class="divider-line"></span>
           <span class="divider-text">or</span>
           <span class="divider-line"></span>
         </div>
 
-        <!-- Email Login Form -->
         <form id="email-login-form" class="email-login-form">
           <div class="form-group">
             <input type="email" id="email-input" class="form-input" placeholder="Email address" required>
@@ -169,7 +198,6 @@
           <button type="submit" class="login-submit-btn">Sign In</button>
         </form>
 
-        <!-- Additional Links -->
         <div class="login-footer">
           <a href="#" id="forgot-password-link" class="login-link">Forgot password?</a>
           <span class="login-separator">•</span>
@@ -177,7 +205,7 @@
         </div>
       </div>
 
-      <!-- Logged In View -->
+      <!-- Profile View -->
       <div id="account-profile-view" class="account-view" style="display: none;">
         <div class="profile-section">
           <div class="profile-header">
