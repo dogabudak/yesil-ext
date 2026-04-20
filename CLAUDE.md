@@ -1,54 +1,53 @@
-# CLAUDE.md - Chrome Extension: Website Tracker & Cookie Manager
+# CLAUDE.md - Chrome Extension: YesilDoga Green Score
 
 ## Project Overview
-This is a Chrome extension that disclose information for sustainability information.
+Chrome extension that displays sustainability scores and environmental data for companies as you browse the web.
 
 ## Architecture
 
 ### Core Files
 - **manifest.json**: Extension configuration (Manifest V3)
-- **background.js**: Service worker for data management and message handling
-- **content.js**: Content script injected into all web pages for tracking and UI injection
+- **background.js**: Service worker — handles API lookups via `fetchCompanyByDomain` message
+- **content.js**: Content script injected into all web pages — detects domain, fetches company data, renders sustainability overlay popup
 - **popup.js**: Popup interface logic and controls
 - **popup.html**: Extension popup HTML structure
 - **popup.css**: Popup styling
 - **config.js**: Configuration file for API endpoints and caching settings
 
 ### Key Features
-1. **URL Parameter Tracking**: Monitor and modify query parameters
-2. **Sustainability Info Display**: Shows company environmental data in an overlay popup
-3. **Data Export**: Export tracking data as JSON files
+1. **Sustainability Info Display**: Shows company environmental data in a floating overlay popup
+2. **Domain-based Lookup**: Automatically identifies the company behind any website via backend API
+3. **Multi-language Support**: Company descriptions available in EN, TR, DE
 
 ## Technical Details
 
 ### Permissions Required
-- `cookies`: Read and modify cookies across all websites
-- `storage`: Store tracking data and user settings
-- `activeTab`: Access current tab information
-- `tabs`: Monitor tab changes for navigation tracking
-- `scripting`: Inject scripts for URL parameter manipulation
-- `<all_urls>`: Access all websites for comprehensive tracking
+- `storage`: Cache API responses and user preferences
+- `activeTab`: Access current tab URL for domain lookup
+- `tabs`: Detect tab navigation to trigger lookups
+- `<all_urls>` (host permission): Needed to inject content script and fetch company data on any website
 
 ### Data Storage
-- **Local Storage**: Visit history, cookie history (limited to 1000 visits, 500 cookie changes)
-- **Sync Storage**: User preferences and feature toggles
-- **Automatic Cleanup**: Prevents storage overflow with size limits
+- **Local Storage**: Cached API responses (24-hour expiration via `CONFIG.CACHE_DURATION`)
 
 ### Content Script Functionality
-- **Page Visit Tracking**: Captures URL, title, timestamp, domain, path, search params, referrer
-- **Cookie Monitoring**: Polls for cookie changes every 1000ms
-- **URL Manipulation**: Handles query parameter modifications via history API
-- **Company Info Display**: Creates overlay popup with sustainability data
+- **Domain Detection**: Extracts domain from current page URL
+- **Company Info Display**: Creates floating overlay popup with sustainability data (carbon neutral status, renewable energy %, certifications, alternatives)
+- **SPA Navigation**: Mutation observer detects URL changes on single-page apps
 
 ### Background Service Worker
-- **Data Management**: Stores and retrieves visit/cookie history
-- **Cookie API Integration**: Handles cookie get/set/remove operations
-- **Tab Monitoring**: Listens to tab updates and cookie changes
+- **API Proxy**: Fetches company data from backend via `handleFetchCompany(domain)`
+- **Timeout Handling**: 10-second abort controller on API requests
 
 ### Popup Interface
-- **Current Site Info**: Displays URL, parameters, and cookie count
-- **Action Buttons**: Clear cookies, export data, view history
-- **Visit History**: Shows last 10 visits with timestamps
+- **Current Site Info**: Displays current URL and company sustainability summary
+- **Action Buttons**: Quick access to extension features
+
+### Backend API
+- **Base URL**: `https://yesildoga-api.onrender.com`
+- **Domain Lookup**: `GET /api/companies/domain/{domain}/`
+- **Company Search**: `GET /api/companies/search?q=...`
+- **Data Version**: `GET /api/data/version`
 
 ## Development Commands
 
@@ -57,60 +56,21 @@ This is a Chrome extension that disclose information for sustainability informat
 # Load extension in Chrome
 # 1. Open chrome://extensions/
 # 2. Enable Developer mode
-# 3. Click "Load unpacked" and select project directory
+# 3. Click "Load unpacked" and select this directory
 
-# Test on various websites to verify tracking
-# Check popup functionality and data export
+# Test on various websites to verify company data loads
+# Check popup functionality and overlay rendering
 ```
-
-### Data Management
-The extension fetches company sustainability data from a backend API service and caches it locally in `data/data.json`. The data includes:
-- Company domains and names
-- Parent company relationships
-- Headquarters locations
-- Carbon neutrality status
-- Renewable energy percentages
-- Sector classifications
-- ESG policy information
-
-#### Backend Service Integration
-- **API-Only Architecture**: Exclusively uses backend service for data (no local fallback)
-- **Caching Strategy**: Local caching with periodic updates to minimize API calls
-- **Data Freshness**: Configurable cache expiration and refresh intervals
-- **Error Handling**: Graceful degradation when API is unavailable
 
 ### Code Style Notes
 - Uses async/await for Chrome API calls
 - Implements proper error handling with try/catch blocks
 - Follows Chrome Extension Manifest V3 standards
 - Uses modern JavaScript features (URLSearchParams, fetch API)
-- Implements proper cleanup and memory management
+- API-only architecture — no local data fallback
 
 ### Security Considerations
-- Requires broad permissions (`<all_urls>`) for comprehensive tracking
-- Stores sensitive tracking data locally
-- Accesses and manipulates cookies across all websites
-- Injects content scripts into all web pages
-
-## Backend Service Requirements
-The extension requires a backend service that provides:
-- RESTful API endpoint for company sustainability data
-- Support for domain-based queries
-- JSON response format matching the expected data structure
-- Optional authentication and rate limiting
-- Data versioning and update notifications
-
-## Future Enhancements
-- Real-time data updates from backend service
-- Enhanced privacy controls and data retention policies
-- Better data visualization in popup interface
-- Advanced API integration features
-- Offline mode with comprehensive local caching
-
-## Usage Notes
-- Extension icon appears in browser toolbar
-- Click to open popup with current site information
-- Toggle features on/off as needed
-- Export data regularly for backup
-- Monitor visit history through popup interface
-- Company sustainability info appears automatically on matching websites
+- Requires `<all_urls>` host permission to function on any website
+- No user tracking — only fetches company data by domain
+- No cookies, no visit history, no personal data collection
+- Content script injects UI overlay only (no page modification)

@@ -1,7 +1,7 @@
 // Configuration file for Chrome extension
 const CONFIG = {
   // Backend API configuration
-  API_BASE_URL: 'http://localhost:8082',
+  API_BASE_URL: 'https://yesildoga-api.onrender.com',
   API_ENDPOINTS: {
     COMPANIES: '/api/companies',
     SEARCH: '/api/companies/search',
@@ -23,8 +23,8 @@ const CONFIG = {
   RETRY_ATTEMPTS: 2,
   
   // Development settings
-  DEBUG_MODE: true,
-  LOG_API_CALLS: true
+  DEBUG_MODE: false,
+  LOG_API_CALLS: false
 };
 
 // Export for use in other files

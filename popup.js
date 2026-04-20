@@ -72,12 +72,10 @@ function setupLoginListeners() {
 
   document.getElementById('forgot-password-link').addEventListener('click', (e) => {
     e.preventDefault();
-    // TODO: Implement password reset flow
   });
 
   document.getElementById('create-account-link').addEventListener('click', (e) => {
     e.preventDefault();
-    // TODO: Implement account creation flow
   });
 
   document.getElementById('logout-btn').addEventListener('click', handleLogout);
@@ -264,12 +262,15 @@ function displayCompanyInfo(data) {
 
   // Carbon badge
   const badge = document.getElementById('carbon-badge');
+  const leafIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8a8 8 0 0 1-10 10Z"/><path d="M11 20c-1.2 0-2 0-2-1.33s.8-2.67 2-4V20Z"/></svg>`;
+  const cloudIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a5.5 5.5 0 0 0 0-11h-1.3a8 8 0 1 0-14.5 4.5"/><path d="m11 13 3 3-3 3"/><path d="m11 16h9"/></svg>`;
+
   if (data.carbon_neutral) {
     badge.className = 'carbon-badge positive';
-    badge.textContent = '✅ Carbon Neutral';
+    badge.innerHTML = `${leafIcon} <span>Carbon Neutral</span>`;
   } else {
     badge.className = 'carbon-badge negative';
-    badge.textContent = '❌ Not Carbon Neutral';
+    badge.innerHTML = `${cloudIcon} <span>Not Carbon Neutral</span>`;
   }
 
   // Sector

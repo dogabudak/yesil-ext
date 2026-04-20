@@ -1,14 +1,12 @@
 {
   "manifest_version": 3,
-  "name": "Website Tracker & Cookie Manager",
+  "name": "YesilDoga Green Score",
   "version": "1.0.0",
-  "description": "Track websites, manipulate cookies and query parameters",
+  "description": "See the sustainability score of any website you visit",
   "permissions": [
-    "cookies",
     "storage",
     "activeTab",
-    "tabs",
-    "scripting"
+    "tabs"
   ],
   "host_permissions": [
     "<all_urls>"
@@ -25,7 +23,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Website Tracker"
+    "default_title": "YesilDoga Green Score"
   },
   "icons": {
     "16": "icons/icon16.png",
