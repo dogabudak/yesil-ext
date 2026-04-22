@@ -24,7 +24,7 @@ function setupTabNavigation() {
 // Auth
 async function checkAuthState() {
   try {
-    const authData = await chrome.storage.local.get(['authToken', 'userEmail', 'authProvider', 'authTimestamp']);
+    const authData = await chrome.storage.local.get(['authToken', 'username', 'authProvider', 'authTimestamp']);
     if (authData.authToken) {
       showProfileView(authData);
     } else {
@@ -39,70 +39,149 @@ async function checkAuthState() {
 function showLoginView() {
   document.getElementById('account-login-view').style.display = 'block';
   document.getElementById('account-profile-view').style.display = 'none';
+  showAuthForm('login');
+}
+
+function showAuthForm(mode) {
+  const loginForm = document.getElementById('login-form');
+  const signupForm = document.getElementById('signup-form');
+  const title = document.getElementById('auth-view-title');
+  const toggleLink = document.getElementById('toggle-auth-view');
+
+  hideAuthError();
+
+  if (mode === 'signup') {
+    loginForm.style.display = 'none';
+    signupForm.style.display = 'flex';
+    title.textContent = 'Create Account';
+    toggleLink.textContent = 'Back to login';
+  } else {
+    loginForm.style.display = 'flex';
+    signupForm.style.display = 'none';
+    title.textContent = 'Sign In';
+    toggleLink.textContent = 'Create account';
+  }
 }
 
 function showProfileView(authData) {
   document.getElementById('account-login-view').style.display = 'none';
   document.getElementById('account-profile-view').style.display = 'block';
 
-  const email = authData.userEmail || 'user@example.com';
-  const provider = authData.authProvider || 'email';
+  const username = authData.username || 'User';
 
-  document.getElementById('profile-avatar-text').textContent = email.charAt(0).toUpperCase();
-  document.getElementById('profile-name').textContent = email.split('@')[0];
-  document.getElementById('profile-email').textContent = email;
-  document.getElementById('profile-provider').textContent = provider.charAt(0).toUpperCase() + provider.slice(1);
+  document.getElementById('profile-avatar-text').textContent = username.charAt(0).toUpperCase();
+  document.getElementById('profile-name').textContent = username;
+  document.getElementById('profile-email').textContent = username;
+  document.getElementById('profile-provider').textContent = 'Username/Password';
 
   if (authData.authTimestamp) {
     document.getElementById('profile-member-since').textContent = new Date(authData.authTimestamp).toLocaleDateString();
   }
 }
 
+function showAuthError(message) {
+  const errorEl = document.getElementById('auth-error');
+  errorEl.textContent = message;
+  errorEl.style.display = 'block';
+}
+
+function hideAuthError() {
+  document.getElementById('auth-error').style.display = 'none';
+}
+
 function setupLoginListeners() {
-  document.getElementById('google-login-btn').addEventListener('click', () => handleMockLogin('google', 'user@gmail.com'));
-  document.getElementById('facebook-login-btn').addEventListener('click', () => handleMockLogin('facebook', 'user@facebook.com'));
-  document.getElementById('apple-login-btn').addEventListener('click', () => handleMockLogin('apple', 'user@apple.com'));
-  document.getElementById('github-login-btn').addEventListener('click', () => handleMockLogin('github', 'user@github.com'));
-
-  document.getElementById('email-login-form').addEventListener('submit', async (e) => {
+  // Login form
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = document.getElementById('email-input').value;
-    await handleMockLogin('email', email);
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+    if (!username || !password) return;
+    await handleLogin(username, password);
   });
 
-  document.getElementById('forgot-password-link').addEventListener('click', (e) => {
+  // Signup form
+  document.getElementById('signup-form').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const username = document.getElementById('signup-username').value.trim();
+    const password = document.getElementById('signup-password').value;
+    const confirmPassword = document.getElementById('signup-confirm-password').value;
+
+    if (!username || !password) return;
+    if (password !== confirmPassword) {
+      showAuthError('Passwords do not match');
+      return;
+    }
+    await handleSignup(username, password);
   });
 
-  document.getElementById('create-account-link').addEventListener('click', (e) => {
+  // Toggle login/signup
+  document.getElementById('toggle-auth-view').addEventListener('click', (e) => {
     e.preventDefault();
+    const loginForm = document.getElementById('login-form');
+    const isLogin = loginForm.style.display !== 'none';
+    showAuthForm(isLogin ? 'signup' : 'login');
   });
 
   document.getElementById('logout-btn').addEventListener('click', handleLogout);
 }
 
-async function handleMockLogin(provider, email) {
+async function handleLogin(username, password) {
+  hideAuthError();
   try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'loginUser',
+      username,
+      password
+    });
+
+    if (response.error) {
+      showAuthError(response.error);
+      return;
+    }
+
     const authData = {
-      authToken: 'mock_token_' + Date.now(),
-      userEmail: email,
-      authProvider: provider,
+      authToken: response.token,
+      username: username,
+      authProvider: 'username',
       authTimestamp: Date.now()
     };
     await chrome.storage.local.set(authData);
     showProfileView(authData);
   } catch (error) {
     console.error('Login error:', error);
+    showAuthError('Login failed. Please try again.');
+  }
+}
+
+async function handleSignup(username, password) {
+  hideAuthError();
+  try {
+    const response = await chrome.runtime.sendMessage({
+      action: 'signupUser',
+      username,
+      password
+    });
+
+    if (response.error) {
+      showAuthError(response.error);
+      return;
+    }
+
+    // Auto-login after successful signup
+    await handleLogin(username, password);
+  } catch (error) {
+    console.error('Signup error:', error);
+    showAuthError('Signup failed. Please try again.');
   }
 }
 
 async function handleLogout() {
   try {
-    await chrome.storage.local.remove(['authToken', 'userEmail', 'authProvider', 'authTimestamp']);
+    await chrome.storage.local.remove(['authToken', 'username', 'authProvider', 'authTimestamp']);
     showLoginView();
   } catch (error) {
     console.error('Logout error:', error);
-    await chrome.storage.local.remove(['authToken', 'userEmail', 'authProvider', 'authTimestamp']);
+    await chrome.storage.local.remove(['authToken', 'username', 'authProvider', 'authTimestamp']);
     showLoginView();
   }
 }

@@ -11,8 +11,55 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     case 'fetchCompanyByDomain':
       handleFetchCompany(request.domain, sendResponse);
       return true;
+    case 'loginUser':
+      handleLogin(request.username, request.password, sendResponse);
+      return true;
+    case 'signupUser':
+      handleSignup(request.username, request.password, sendResponse);
+      return true;
   }
 });
+
+async function handleLogin(username, password, sendResponse) {
+  try {
+    const response = await fetch(`${CONFIG.AUTH_BASE_URL}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    if (response.ok) {
+      const token = await response.text();
+      sendResponse({ token: token.trim() });
+    } else {
+      const errorText = await response.text();
+      sendResponse({ error: errorText || 'Invalid credentials' });
+    }
+  } catch (error) {
+    console.error('Login request failed:', error.message);
+    sendResponse({ error: 'Could not connect to auth service' });
+  }
+}
+
+async function handleSignup(username, password, sendResponse) {
+  try {
+    const response = await fetch(`${CONFIG.USER_BASE_URL}/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user: { username, password } })
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      sendResponse({ message: data.message || 'User registered successfully' });
+    } else {
+      sendResponse({ error: data.message || data.error || 'Signup failed' });
+    }
+  } catch (error) {
+    console.error('Signup request failed:', error.message);
+    sendResponse({ error: 'Could not connect to user service' });
+  }
+}
 
 async function handleFetchCompany(domain, sendResponse) {
   try {

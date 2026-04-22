@@ -517,6 +517,49 @@ body {
   border-color: #2f363d;
 }
 
+/* Auth Error */
+.auth-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* Auth Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Disabled Social Buttons */
+.social-btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  position: relative;
+}
+
+.social-btn-disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.coming-soon-badge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: #e0e0e0;
+  color: #666;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+
 .login-divider {
   display: flex;
   align-items: center;

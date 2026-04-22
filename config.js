@@ -2,6 +2,8 @@
 const CONFIG = {
   // Backend API configuration
   API_BASE_URL: 'https://yesildoga-api.onrender.com',
+  AUTH_BASE_URL: 'http://localhost:8000',
+  USER_BASE_URL: 'http://localhost:3020',
   API_ENDPOINTS: {
     COMPANIES: '/api/companies',
     SEARCH: '/api/companies/search',
