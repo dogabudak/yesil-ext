@@ -1,4 +1,15 @@
+const CAMPAIGNS = [
+  { id: 'forest',      title: 'Forests',      description: 'Protect and restore forests worldwide',      icon: '\u{1F332}' },
+  { id: 'seas',        title: 'Seas',         description: 'Clean oceans and marine conservation',       icon: '\u{1F30A}' },
+  { id: 'agriculture', title: 'Agriculture',  description: 'Sustainable farming and food systems',       icon: '\u{1F33E}' },
+  { id: 'education',   title: 'Education',    description: 'Environmental awareness and learning',       icon: '\u{1F4DA}' },
+  { id: 'charity',     title: 'Charity',      description: 'Support environmental charities and causes', icon: '\u{1F49A}' }
+];
+
 document.addEventListener('DOMContentLoaded', async () => {
+  await loadAndApplyCampaignTheme();
+  renderCampaignCards();
+  setupCampaignListeners();
   setupTabNavigation();
   await checkAuthState();
   setupLoginListeners();
@@ -477,6 +488,79 @@ function displayDescription(lang) {
 
   // Replace newlines with <br> for proper formatting
   contentEl.innerHTML = escapeHtml(displayText).replace(/\n/g, '<br>');
+}
+
+// Campaign theme functions
+async function loadAndApplyCampaignTheme() {
+  try {
+    const result = await chrome.storage.sync.get({ selectedCampaign: null });
+    applyCampaignTheme(result.selectedCampaign);
+  } catch (e) {
+    console.error('Error loading campaign theme:', e);
+  }
+}
+
+function applyCampaignTheme(campaignId) {
+  const colors = (campaignId && CONFIG.CAMPAIGN_COLORS[campaignId]) || CONFIG.DEFAULT_THEME_COLORS;
+  const style = document.documentElement.style;
+  style.setProperty('--theme-primary', colors.primary);
+  style.setProperty('--theme-secondary', colors.secondary);
+  // Compute a lighter tertiary from secondary for gradient endpoints
+  style.setProperty('--theme-tertiary', colors.secondary);
+  updateCampaignDot(campaignId);
+}
+
+function updateCampaignDot(campaignId) {
+  const dot = document.getElementById('score-campaign-dot');
+  if (!dot) return;
+  if (campaignId && CONFIG.CAMPAIGN_COLORS[campaignId]) {
+    dot.classList.add('visible');
+    dot.style.background = CONFIG.CAMPAIGN_COLORS[campaignId].primary;
+  } else {
+    dot.classList.remove('visible');
+    dot.style.background = '';
+  }
+}
+
+function renderCampaignCards() {
+  const list = document.getElementById('campaigns-list');
+  if (!list) return;
+
+  chrome.storage.sync.get({ selectedCampaign: null }, (result) => {
+    const selected = result.selectedCampaign;
+    list.innerHTML = CAMPAIGNS.map(c => `
+      <div class="campaign-card${c.id === selected ? ' selected' : ''}" data-campaign="${c.id}">
+        <div class="campaign-card-icon">${c.icon}</div>
+        <div class="campaign-card-content">
+          <div class="campaign-card-title">${c.title}</div>
+          <div class="campaign-card-desc">${c.description}</div>
+        </div>
+        <div class="campaign-card-check">${c.id === selected ? '\u2713' : ''}</div>
+      </div>
+    `).join('');
+
+  });
+}
+
+function setupCampaignListeners() {
+  const list = document.getElementById('campaigns-list');
+
+  if (list) {
+    list.addEventListener('click', (e) => {
+      const card = e.target.closest('.campaign-card');
+      if (!card) return;
+      const campaignId = card.dataset.campaign;
+
+      chrome.storage.sync.get({ selectedCampaign: null }, (result) => {
+        // Toggle: if already selected, deselect
+        const newSelection = result.selectedCampaign === campaignId ? null : campaignId;
+        chrome.storage.sync.set({ selectedCampaign: newSelection }, () => {
+          applyCampaignTheme(newSelection);
+          renderCampaignCards();
+        });
+      });
+    });
+  }
 }
 
 function setupLanguageButtons(description, defaultLang) {

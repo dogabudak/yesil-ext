@@ -133,29 +133,44 @@ function getCarbonNeutralAlternatives(companyData) {
   return companyData.carbon_neutral_alternatives || [];
 }
 
+function getThemeColors(selectedCampaign) {
+  if (selectedCampaign && CONFIG.CAMPAIGN_COLORS && CONFIG.CAMPAIGN_COLORS[selectedCampaign]) {
+    return CONFIG.CAMPAIGN_COLORS[selectedCampaign];
+  }
+  return CONFIG.DEFAULT_THEME_COLORS || { primary: '#2d6a4f', secondary: '#40916c' };
+}
+
 async function checkWebsiteAndShowInfo() {
   const currentDomain = location.hostname.replace('www.', '');
 
-  // Check if always-on mode is enabled
-  const settings = await chrome.storage.sync.get({ alwaysOnEnabled: false });
+  // Check if always-on mode is enabled and get campaign selection
+  const settings = await chrome.storage.sync.get({ alwaysOnEnabled: false, selectedCampaign: null });
 
   // Query specific domain from database
   const companyData = await getCompanyByDomain(currentDomain);
 
   if (companyData) {
-    createWebsiteInfoPopup(companyData);
+    createWebsiteInfoPopup(companyData, settings.selectedCampaign);
   } else if (settings.alwaysOnEnabled) {
-    createUnknownGreenScorePopup(currentDomain);
+    createUnknownGreenScorePopup(currentDomain, settings.selectedCampaign);
   }
 }
 
-function createWebsiteInfoPopup(companyInfo) {
+// Re-render overlay when campaign selection changes
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'sync' && changes.selectedCampaign) {
+    checkWebsiteAndShowInfo();
+  }
+});
+
+function createWebsiteInfoPopup(companyInfo, selectedCampaign) {
   // Remove existing popup if any
   const existingPopup = document.getElementById('website-info-popup');
   if (existingPopup) {
     existingPopup.remove();
   }
 
+  const theme = getThemeColors(selectedCampaign);
   const isCarbon = companyInfo.carbon_neutral;
   const countryFlag = getCountryEmoji(companyInfo.origin);
 
@@ -207,9 +222,10 @@ function createWebsiteInfoPopup(companyInfo) {
         align-items: center;
         justify-content: space-between;
         padding: 14px 16px;
-        background: linear-gradient(135deg, #2d6a4f, #40916c);
+        background: linear-gradient(135deg, ${theme.primary}, ${theme.secondary});
         color: white;
         border-radius: 12px 12px 0 0;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
       }
       #website-info-popup .gs-header-left {
         display: flex;
@@ -310,16 +326,16 @@ function createWebsiteInfoPopup(companyInfo) {
       #website-info-popup .gs-progress-bar {
         height: 100%;
         border-radius: 4px;
-        background: linear-gradient(90deg, #40916c, #52b788);
+        background: linear-gradient(90deg, ${theme.secondary}, ${theme.secondary});
       }
-      #website-info-popup .gs-meter-percent { font-size: 12px; font-weight: 600; color: #40916c; min-width: 36px; text-align: right; }
+      #website-info-popup .gs-meter-percent { font-size: 12px; font-weight: 600; color: ${theme.secondary}; min-width: 36px; text-align: right; }
       #website-info-popup .gs-alternatives-section {
         background: white;
         border-radius: 12px;
         padding: 14px 16px;
         margin-bottom: 12px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        border-left: 4px solid #40916c;
+        border-left: 4px solid ${theme.secondary};
       }
       #website-info-popup .gs-alternatives-subtitle { font-size: 11px; color: #888; margin-bottom: 10px; }
       #website-info-popup .gs-alternatives-list { display: flex; flex-direction: column; gap: 8px; }
@@ -337,14 +353,14 @@ function createWebsiteInfoPopup(companyInfo) {
       #website-info-popup .gs-alt-visit-btn {
         display: inline-flex;
         padding: 5px 10px;
-        background: #40916c;
+        background: ${theme.secondary};
         color: white;
         text-decoration: none;
         border-radius: 6px;
         font-size: 11px;
         font-weight: 600;
       }
-      #website-info-popup .gs-alt-visit-btn:hover { background: #2d6a4f; }
+      #website-info-popup .gs-alt-visit-btn:hover { background: ${theme.primary}; }
       #website-info-popup .gs-certifications-section {
         background: white;
         border-radius: 12px;
@@ -400,8 +416,8 @@ function createWebsiteInfoPopup(companyInfo) {
         color: #666;
         cursor: pointer;
       }
-      #website-info-popup .gs-lang-btn:hover { border-color: #40916c; color: #40916c; }
-      #website-info-popup .gs-lang-btn.active { background: #40916c; border-color: #40916c; color: white; }
+      #website-info-popup .gs-lang-btn:hover { border-color: ${theme.secondary}; color: ${theme.secondary}; }
+      #website-info-popup .gs-lang-btn.active { background: ${theme.secondary}; border-color: ${theme.secondary}; color: white; }
       #website-info-popup .gs-description-content {
         font-size: 12px;
         line-height: 1.6;
@@ -593,13 +609,14 @@ function setupDescriptionLanguageButtons(description) {
   });
 }
 
-function createUnknownGreenScorePopup(domain) {
+function createUnknownGreenScorePopup(domain, selectedCampaign) {
   // Remove existing popup if any
   const existingPopup = document.getElementById('website-info-popup');
   if (existingPopup) {
     existingPopup.remove();
   }
 
+  const theme = getThemeColors(selectedCampaign);
   const popup = document.createElement('div');
   popup.id = 'website-info-popup';
   popup.innerHTML = `
@@ -623,9 +640,10 @@ function createUnknownGreenScorePopup(domain) {
         align-items: center;
         justify-content: space-between;
         padding: 14px 16px;
-        background: linear-gradient(135deg, #2d6a4f, #40916c);
+        background: linear-gradient(135deg, ${theme.primary}, ${theme.secondary});
         color: white;
         border-radius: 12px 12px 0 0;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
       }
       #website-info-popup .gs-header-left {
         display: flex;
@@ -658,9 +676,9 @@ function createUnknownGreenScorePopup(domain) {
         border-radius: 12px;
         padding: 14px 16px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        border-left: 4px solid #40916c;
+        border-left: 4px solid ${theme.secondary};
       }
-      #website-info-popup .gs-help-title { font-size: 12px; font-weight: 600; color: #2d6a4f; margin-bottom: 6px; }
+      #website-info-popup .gs-help-title { font-size: 12px; font-weight: 600; color: ${theme.primary}; margin-bottom: 6px; }
       #website-info-popup .gs-help-text { font-size: 11px; color: #666; line-height: 1.4; }
       #website-info-popup .gs-footer { font-size: 10px; color: #aaa; font-style: italic; text-align: center; margin-top: 12px; }
     </style>

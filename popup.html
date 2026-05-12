@@ -16,7 +16,8 @@
 
     <!-- Tab Navigation -->
     <div class="tab-navigation">
-      <button class="tab-btn active" data-tab="score">Score</button>
+      <button class="tab-btn active" data-tab="score">Score<span class="campaign-dot" id="score-campaign-dot"></span></button>
+      <button class="tab-btn" data-tab="campaigns">Campaigns</button>
       <button class="tab-btn" data-tab="account">Account</button>
     </div>
 
@@ -138,6 +139,12 @@
         <h2 class="no-data-title">Unable to Load</h2>
         <p class="no-data-text">Could not retrieve sustainability data. Please try again later.</p>
       </div>
+    </div>
+
+    <!-- Campaigns Tab -->
+    <div id="campaigns-tab" class="tab-content">
+      <p class="campaigns-description">By selecting one of these campaigns, your browser activity will support one of the causes below.</p>
+      <div class="campaigns-list" id="campaigns-list"></div>
     </div>
 
     <!-- Account Tab -->
