@@ -1,13 +1,54 @@
-const CAMPAIGNS = [
-  { id: 'forest',      title: 'Forests',      description: 'Protect and restore forests worldwide',      icon: '\u{1F332}' },
-  { id: 'seas',        title: 'Seas',         description: 'Clean oceans and marine conservation',       icon: '\u{1F30A}' },
-  { id: 'agriculture', title: 'Agriculture',  description: 'Sustainable farming and food systems',       icon: '\u{1F33E}' },
-  { id: 'education',   title: 'Education',    description: 'Environmental awareness and learning',       icon: '\u{1F4DA}' },
-  { id: 'charity',     title: 'Charity',      description: 'Support environmental charities and causes', icon: '\u{1F49A}' }
-];
+let CAMPAIGNS = [];
+
+async function fetchCampaigns() {
+  try {
+    // Check cache first
+    const cached = await chrome.storage.local.get(['campaigns_data', 'campaigns_data_time']);
+    const cacheDuration = CONFIG.CAMPAIGNS_CACHE_DURATION || 60 * 60 * 1000;
+    if (cached.campaigns_data && cached.campaigns_data_time) {
+      const age = Date.now() - cached.campaigns_data_time;
+      if (age < cacheDuration) {
+        CAMPAIGNS = cached.campaigns_data;
+        return;
+      }
+    }
+
+    // Fetch from API via background service worker
+    const response = await chrome.runtime.sendMessage({ action: 'fetchCampaigns' });
+
+    if (response && response.data && Array.isArray(response.data) && response.data.length > 0) {
+      CAMPAIGNS = response.data.map(c => ({
+        id: c.slug,
+        title: c.name,
+        description: c.tagline,
+        icon: c.icon,
+        accentColor: c.accent_color || null
+      }));
+
+      // Update campaign colors from API accent_color
+      response.data.forEach(c => {
+        if (c.accent_color && c.slug) {
+          CONFIG.CAMPAIGN_COLORS[c.slug] = {
+            primary: c.accent_color,
+            secondary: CONFIG.CAMPAIGN_COLORS[c.slug]?.secondary || c.accent_color
+          };
+        }
+      });
+
+      // Cache the result
+      await chrome.storage.local.set({
+        campaigns_data: CAMPAIGNS,
+        campaigns_data_time: Date.now()
+      });
+    }
+  } catch (error) {
+    console.error('Error fetching campaigns:', error);
+  }
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
   await loadAndApplyCampaignTheme();
+  await fetchCampaigns();
   renderCampaignCards();
   setupCampaignListeners();
   setupTabNavigation();
@@ -367,7 +408,7 @@ function displayCompanyInfo(data) {
   document.getElementById('company-sector').textContent = data.sector || 'N/A';
 
   // HQ
-  document.getElementById('company-hq').textContent = data.hq_city || 'N/A';
+  document.getElementById('company-hq').textContent = data.headquarters || 'N/A';
 
   // Country of origin card
   if (data.origin) {

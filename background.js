@@ -17,6 +17,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     case 'signupUser':
       handleSignup(request.username, request.password, sendResponse);
       return true;
+    case 'fetchCampaigns':
+      handleFetchCampaigns(sendResponse);
+      return true;
   }
 });
 
@@ -58,6 +61,27 @@ async function handleSignup(username, password, sendResponse) {
   } catch (error) {
     console.error('Signup request failed:', error.message);
     sendResponse({ error: 'Could not connect to user service' });
+  }
+}
+
+async function handleFetchCampaigns(sendResponse) {
+  try {
+    const apiUrl = `${CONFIG.API_BASE_URL}${CONFIG.API_ENDPOINTS.CAMPAIGNS}/`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT || 10000);
+
+    const response = await fetch(apiUrl, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (response.ok) {
+      const result = await response.json();
+      sendResponse({ data: result });
+    } else {
+      sendResponse({ data: null, error: `API ${response.status}` });
+    }
+  } catch (error) {
+    console.error('Campaigns fetch failed:', error.message);
+    sendResponse({ data: null, error: error.message });
   }
 }
 

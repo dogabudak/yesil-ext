@@ -8,12 +8,13 @@ const CONFIG = {
     COMPANIES: '/api/companies',
     SEARCH: '/api/companies/search',
     DOMAIN_LOOKUP: '/api/companies/domain',
-    VERSION: '/api/data/version'
+    VERSION: '/api/data/version',
+    CAMPAIGNS: '/api/campaigns'
   },
-  
-  // Cache settings
+
   // Cache settings
   CACHE_DURATION: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+  CAMPAIGNS_CACHE_DURATION: 60 * 60 * 1000, // 1 hour in milliseconds
   CACHE_KEY: 'sustainability_data_cache',
   CACHE_VERSION_KEY: 'sustainability_data_version',
   
