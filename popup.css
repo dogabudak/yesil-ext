@@ -868,7 +868,10 @@ body {
 
 /* Popup Footer */
 .popup-footer {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   padding: 10px 16px;
   border-top: 1px solid #e0e0e0;
 }
@@ -882,6 +885,34 @@ body {
 .privacy-link:hover {
   color: var(--theme-secondary);
   text-decoration: underline;
+}
+
+/* UI Language Selector */
+.ui-lang-selector {
+  display: flex;
+  gap: 4px;
+}
+
+.ui-lang-btn {
+  padding: 3px 7px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  font-size: 10px;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+}
+
+.ui-lang-btn:hover {
+  border-color: var(--theme-secondary);
+  color: var(--theme-secondary);
+}
+
+.ui-lang-btn.active {
+  background: var(--theme-secondary);
+  border-color: var(--theme-secondary);
+  color: white;
 }
 
 /* Certifications Section */

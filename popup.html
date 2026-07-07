@@ -16,9 +16,9 @@
 
     <!-- Tab Navigation -->
     <div class="tab-navigation">
-      <button class="tab-btn active" data-tab="score">Score<span class="campaign-dot" id="score-campaign-dot"></span></button>
-      <button class="tab-btn" data-tab="campaigns">Campaigns</button>
-      <button class="tab-btn" data-tab="account">Account</button>
+      <button class="tab-btn active" data-tab="score"><span data-i18n="tab_score">Score</span><span class="campaign-dot" id="score-campaign-dot"></span></button>
+      <button class="tab-btn" data-tab="campaigns" data-i18n="tab_campaigns">Campaigns</button>
+      <button class="tab-btn" data-tab="account" data-i18n="tab_account">Account</button>
     </div>
 
     <!-- Score Tab -->
@@ -26,7 +26,7 @@
       <!-- Loading State -->
       <div id="loading-state" class="state-view">
         <div class="loader"></div>
-        <p class="loading-text">Checking sustainability data...</p>
+        <p class="loading-text" data-i18n="loading_text">Checking sustainability data...</p>
       </div>
 
       <!-- Company Found -->
@@ -48,28 +48,28 @@
           <div class="info-card">
             <div class="info-card-icon">🏢</div>
             <div class="info-card-content">
-              <span class="info-card-label">Sector</span>
+              <span class="info-card-label" data-i18n="label_sector">Sector</span>
               <span id="company-sector" class="info-card-value"></span>
             </div>
           </div>
           <div class="info-card">
             <div class="info-card-icon">📍</div>
             <div class="info-card-content">
-              <span class="info-card-label">Headquarters</span>
+              <span class="info-card-label" data-i18n="label_headquarters">Headquarters</span>
               <span id="company-hq" class="info-card-value"></span>
             </div>
           </div>
           <div class="info-card" id="origin-card" style="display: none;">
             <div class="info-card-icon" id="origin-flag-small"></div>
             <div class="info-card-content">
-              <span class="info-card-label">Country of Origin</span>
+              <span class="info-card-label" data-i18n="label_origin">Country of Origin</span>
               <span id="company-origin" class="info-card-value"></span>
             </div>
           </div>
           <div class="info-card" id="parent-card" style="display: none;">
             <div class="info-card-icon">🏛️</div>
             <div class="info-card-content">
-              <span class="info-card-label">Parent Company</span>
+              <span class="info-card-label" data-i18n="label_parent">Parent Company</span>
               <span id="company-parent" class="info-card-value"></span>
             </div>
           </div>
@@ -77,14 +77,14 @@
 
         <!-- Sustainability Section -->
         <div class="sustainability-section">
-          <h3 class="section-title">Sustainability</h3>
+          <h3 class="section-title" data-i18n="section_sustainability">Sustainability</h3>
           <div class="sustainability-meters">
             <div class="meter-row">
-              <span class="meter-label">Carbon Neutral</span>
+              <span class="meter-label" data-i18n="meter_carbon_neutral">Carbon Neutral</span>
               <span id="carbon-neutral-value" class="meter-value"></span>
             </div>
             <div class="meter-row" id="renewable-row" style="display: none;">
-              <span class="meter-label">Renewable Energy</span>
+              <span class="meter-label" data-i18n="meter_renewable">Renewable Energy</span>
               <div class="progress-bar-container">
                 <div id="renewable-bar" class="progress-bar"></div>
               </div>
@@ -95,14 +95,14 @@
 
         <!-- Certifications Section -->
         <div id="certifications-section" class="certifications-section" style="display: none;">
-          <h3 class="section-title">Certifications</h3>
+          <h3 class="section-title" data-i18n="section_certifications">Certifications</h3>
           <div id="certifications-list" class="certifications-list"></div>
         </div>
 
         <!-- Description Section -->
         <div id="description-section" class="description-section" style="display: none;">
           <div class="description-header">
-            <h3 class="section-title">About</h3>
+            <h3 class="section-title" data-i18n="section_about">About</h3>
             <div id="language-selector" class="language-selector">
               <button class="lang-btn active" data-lang="en">EN</button>
               <button class="lang-btn" data-lang="tr">TR</button>
@@ -114,8 +114,8 @@
 
         <!-- Alternatives Section -->
         <div id="alternatives-section" class="alternatives-section" style="display: none;">
-          <h3 class="section-title">🌱 Green Alternatives</h3>
-          <p class="alternatives-subtitle">Consider these carbon-neutral options:</p>
+          <h3 class="section-title" data-i18n="section_alternatives">🌱 Green Alternatives</h3>
+          <p class="alternatives-subtitle" data-i18n="alternatives_subtitle">Consider these carbon-neutral options:</p>
           <div id="alternatives-list" class="alternatives-list"></div>
         </div>
 
@@ -128,22 +128,22 @@
       <!-- No Data State -->
       <div id="no-data-view" class="state-view" style="display: none;">
         <div class="no-data-icon">🔍</div>
-        <h2 class="no-data-title">No Data Available</h2>
+        <h2 class="no-data-title" data-i18n="no_data_title">No Data Available</h2>
         <p id="no-data-domain" class="no-data-domain"></p>
-        <p class="no-data-text">We don't have sustainability information for this website yet.</p>
+        <p class="no-data-text" data-i18n="no_data_text">We don't have sustainability information for this website yet.</p>
       </div>
 
       <!-- Error State -->
       <div id="error-view" class="state-view" style="display: none;">
         <div class="no-data-icon">⚠️</div>
-        <h2 class="no-data-title">Unable to Load</h2>
-        <p class="no-data-text">Could not retrieve sustainability data. Please try again later.</p>
+        <h2 class="no-data-title" data-i18n="error_title">Unable to Load</h2>
+        <p class="no-data-text" data-i18n="error_text">Could not retrieve sustainability data. Please try again later.</p>
       </div>
     </div>
 
     <!-- Campaigns Tab -->
     <div id="campaigns-tab" class="tab-content">
-      <p class="campaigns-description">By selecting one of these campaigns, your browser activity will support one of the causes below.</p>
+      <p class="campaigns-description" data-i18n="campaigns_desc">By selecting one of these campaigns, your browser activity will support one of the causes below.</p>
       <div class="campaigns-list" id="campaigns-list"></div>
     </div>
 
@@ -152,8 +152,8 @@
       <!-- Login View -->
       <div id="account-login-view" class="account-view">
         <div class="account-header">
-          <h2 id="auth-view-title">Sign In</h2>
-          <p class="account-subtitle">Sync your data across devices and unlock premium features</p>
+          <h2 id="auth-view-title" data-i18n="auth_signin_title">Sign In</h2>
+          <p class="account-subtitle" data-i18n="auth_subtitle">Sync your data across devices and unlock premium features</p>
         </div>
 
         <div id="auth-error" class="auth-error" style="display: none;"></div>
@@ -161,31 +161,31 @@
         <!-- Login Form -->
         <form id="login-form" class="auth-form">
           <div class="form-group">
-            <input type="text" id="login-username" class="form-input" placeholder="Username" required>
+            <input type="text" id="login-username" class="form-input" placeholder="Username" data-i18n-placeholder="ph_username" required>
           </div>
           <div class="form-group">
-            <input type="password" id="login-password" class="form-input" placeholder="Password" required>
+            <input type="password" id="login-password" class="form-input" placeholder="Password" data-i18n-placeholder="ph_password" required>
           </div>
-          <button type="submit" class="login-submit-btn">Sign In</button>
+          <button type="submit" class="login-submit-btn" data-i18n="btn_signin">Sign In</button>
         </form>
 
         <!-- Signup Form (hidden by default) -->
         <form id="signup-form" class="auth-form" style="display: none;">
           <div class="form-group">
-            <input type="text" id="signup-username" class="form-input" placeholder="Username" required>
+            <input type="text" id="signup-username" class="form-input" placeholder="Username" data-i18n-placeholder="ph_username" required>
           </div>
           <div class="form-group">
-            <input type="password" id="signup-password" class="form-input" placeholder="Password" required>
+            <input type="password" id="signup-password" class="form-input" placeholder="Password" data-i18n-placeholder="ph_password" required>
           </div>
           <div class="form-group">
-            <input type="password" id="signup-confirm-password" class="form-input" placeholder="Confirm Password" required>
+            <input type="password" id="signup-confirm-password" class="form-input" placeholder="Confirm Password" data-i18n-placeholder="ph_confirm_password" required>
           </div>
-          <button type="submit" class="login-submit-btn">Create Account</button>
+          <button type="submit" class="login-submit-btn" data-i18n="btn_create_account">Create Account</button>
         </form>
 
         <div class="login-divider">
           <span class="divider-line"></span>
-          <span class="divider-text">or</span>
+          <span class="divider-text" data-i18n="divider_or">or</span>
           <span class="divider-line"></span>
         </div>
 
@@ -197,33 +197,33 @@
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            Google <span class="coming-soon-badge">Coming Soon</span>
+            Google <span class="coming-soon-badge" data-i18n="badge_coming_soon">Coming Soon</span>
           </button>
 
           <button class="social-login-btn facebook-btn social-btn-disabled" disabled>
             <svg class="social-icon" viewBox="0 0 24 24">
               <path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
             </svg>
-            Facebook <span class="coming-soon-badge">Coming Soon</span>
+            Facebook <span class="coming-soon-badge" data-i18n="badge_coming_soon">Coming Soon</span>
           </button>
 
           <button class="social-login-btn apple-btn social-btn-disabled" disabled>
             <svg class="social-icon" viewBox="0 0 24 24">
               <path fill="white" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
             </svg>
-            Apple <span class="coming-soon-badge">Coming Soon</span>
+            Apple <span class="coming-soon-badge" data-i18n="badge_coming_soon">Coming Soon</span>
           </button>
 
           <button class="social-login-btn github-btn social-btn-disabled" disabled>
             <svg class="social-icon" viewBox="0 0 24 24">
               <path fill="white" d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
             </svg>
-            GitHub <span class="coming-soon-badge">Coming Soon</span>
+            GitHub <span class="coming-soon-badge" data-i18n="badge_coming_soon">Coming Soon</span>
           </button>
         </div>
 
         <div class="login-footer">
-          <a href="#" id="toggle-auth-view" class="login-link">Create account</a>
+          <a href="#" id="toggle-auth-view" class="login-link" data-i18n="link_create_account">Create account</a>
         </div>
       </div>
 
@@ -242,21 +242,21 @@
 
           <div class="profile-details">
             <div class="detail-row">
-              <span class="detail-label">Account Type:</span>
-              <span class="detail-value">Free</span>
+              <span class="detail-label" data-i18n="detail_account_type">Account Type:</span>
+              <span class="detail-value" data-i18n="value_free">Free</span>
             </div>
             <div class="detail-row">
-              <span class="detail-label">Login Method:</span>
+              <span class="detail-label" data-i18n="detail_login_method">Login Method:</span>
               <span id="profile-provider" class="detail-value">Email</span>
             </div>
             <div class="detail-row">
-              <span class="detail-label">Member Since:</span>
+              <span class="detail-label" data-i18n="detail_member_since">Member Since:</span>
               <span id="profile-member-since" class="detail-value">-</span>
             </div>
           </div>
 
           <div class="profile-actions">
-            <button id="logout-btn" class="action-btn logout-btn">Logout</button>
+            <button id="logout-btn" class="action-btn logout-btn" data-i18n="btn_logout">Logout</button>
           </div>
         </div>
       </div>
@@ -264,11 +264,17 @@
 
     <!-- Footer -->
     <div class="popup-footer">
-      <a href="https://yesildoga-api.onrender.com/privacy/" target="_blank" class="privacy-link">Privacy Policy</a>
+      <div class="ui-lang-selector" id="ui-lang-selector" aria-label="Language">
+        <button class="ui-lang-btn" data-uilang="tr">TR</button>
+        <button class="ui-lang-btn" data-uilang="en">EN</button>
+        <button class="ui-lang-btn" data-uilang="de">DE</button>
+      </div>
+      <a href="https://yesildoga-api.onrender.com/privacy/" target="_blank" class="privacy-link" data-i18n="privacy_policy">Privacy Policy</a>
     </div>
   </div>
 
   <script src="config.js"></script>
+  <script src="i18n.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

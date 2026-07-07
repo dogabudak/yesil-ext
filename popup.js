@@ -47,6 +47,9 @@ async function fetchCampaigns() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  await I18N.load();
+  I18N.apply();
+  setupUILangSelector();
   await loadAndApplyCampaignTheme();
   await fetchCampaigns();
   renderCampaignCards();
@@ -56,6 +59,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupLoginListeners();
   await loadCompanyData();
 });
+
+// UI language selector (persists preference; reloads popup to re-render fully)
+function setupUILangSelector() {
+  const buttons = document.querySelectorAll('#ui-lang-selector .ui-lang-btn');
+  buttons.forEach(btn => {
+    const lang = btn.getAttribute('data-uilang');
+    btn.classList.toggle('active', lang === I18N.getLang());
+    btn.addEventListener('click', async () => {
+      if (lang === I18N.getLang()) return;
+      await I18N.save(lang);
+      location.reload();
+    });
+  });
+}
 
 // Tab Navigation
 function setupTabNavigation() {
@@ -105,13 +122,13 @@ function showAuthForm(mode) {
   if (mode === 'signup') {
     loginForm.style.display = 'none';
     signupForm.style.display = 'flex';
-    title.textContent = 'Create Account';
-    toggleLink.textContent = 'Back to login';
+    title.textContent = I18N.t('btn_create_account');
+    toggleLink.textContent = I18N.t('link_back_to_login');
   } else {
     loginForm.style.display = 'flex';
     signupForm.style.display = 'none';
-    title.textContent = 'Sign In';
-    toggleLink.textContent = 'Create account';
+    title.textContent = I18N.t('auth_signin_title');
+    toggleLink.textContent = I18N.t('link_create_account');
   }
 }
 
@@ -124,7 +141,7 @@ function showProfileView(authData) {
   document.getElementById('profile-avatar-text').textContent = username.charAt(0).toUpperCase();
   document.getElementById('profile-name').textContent = username;
   document.getElementById('profile-email').textContent = username;
-  document.getElementById('profile-provider').textContent = 'Username/Password';
+  document.getElementById('profile-provider').textContent = I18N.t('provider_username_password');
 
   if (authData.authTimestamp) {
     document.getElementById('profile-member-since').textContent = new Date(authData.authTimestamp).toLocaleDateString();
@@ -160,7 +177,7 @@ function setupLoginListeners() {
 
     if (!username || !password) return;
     if (password !== confirmPassword) {
-      showAuthError('Passwords do not match');
+      showAuthError(I18N.t('err_passwords_no_match'));
       return;
     }
     await handleSignup(username, password);
@@ -201,7 +218,7 @@ async function handleLogin(username, password) {
     showProfileView(authData);
   } catch (error) {
     console.error('Login error:', error);
-    showAuthError('Login failed. Please try again.');
+    showAuthError(I18N.t('err_login_failed'));
   }
 }
 
@@ -223,7 +240,7 @@ async function handleSignup(username, password) {
     await handleLogin(username, password);
   } catch (error) {
     console.error('Signup error:', error);
-    showAuthError('Signup failed. Please try again.');
+    showAuthError(I18N.t('err_signup_failed'));
   }
 }
 
@@ -301,7 +318,7 @@ async function loadCompanyData() {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (!tab?.url || tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://')) {
       showView('no-data-view');
-      document.getElementById('no-data-domain').textContent = 'Internal browser page';
+      document.getElementById('no-data-domain').textContent = I18N.t('internal_browser_page');
       return;
     }
 
@@ -398,17 +415,17 @@ function displayCompanyInfo(data) {
 
   if (data.carbon_neutral) {
     badge.className = 'carbon-badge positive';
-    badge.innerHTML = `${leafIcon} <span>Carbon Neutral</span>`;
+    badge.innerHTML = `${leafIcon} <span>${escapeHtml(I18N.t('badge_carbon_neutral'))}</span>`;
   } else {
     badge.className = 'carbon-badge negative';
-    badge.innerHTML = `${cloudIcon} <span>Not Carbon Neutral</span>`;
+    badge.innerHTML = `${cloudIcon} <span>${escapeHtml(I18N.t('badge_not_carbon_neutral'))}</span>`;
   }
 
   // Sector
-  document.getElementById('company-sector').textContent = data.sector || 'N/A';
+  document.getElementById('company-sector').textContent = data.sector || I18N.t('na');
 
   // HQ
-  document.getElementById('company-hq').textContent = data.headquarters || 'N/A';
+  document.getElementById('company-hq').textContent = data.headquarters || I18N.t('na');
 
   // Country of origin card
   if (data.origin) {
@@ -428,10 +445,10 @@ function displayCompanyInfo(data) {
   // Carbon neutral value
   const cnValue = document.getElementById('carbon-neutral-value');
   if (data.carbon_neutral) {
-    cnValue.textContent = '✅ Yes';
+    cnValue.textContent = `✅ ${I18N.t('value_yes')}`;
     cnValue.style.color = '#28a745';
   } else {
-    cnValue.textContent = '❌ No';
+    cnValue.textContent = `❌ ${I18N.t('value_no')}`;
     cnValue.style.color = '#dc3545';
   }
 
@@ -454,7 +471,7 @@ function displayCompanyInfo(data) {
           <div class="alt-name">${escapeHtml(alt.name)}</div>
           <div class="alt-description">${escapeHtml(alt.description || '')}</div>
         </div>
-        <a href="${escapeHtml(alt.url)}" target="_blank" class="alt-visit-btn">Visit</a>
+        <a href="${escapeHtml(alt.url)}" target="_blank" class="alt-visit-btn">${escapeHtml(I18N.t('btn_visit'))}</a>
       </div>
     `).join('');
   }
@@ -489,9 +506,9 @@ function displayCompanyInfo(data) {
     // Store description data for language switching
     window.companyDescription = description;
 
-    // Get browser language or default to 'en'
-    const browserLang = navigator.language.slice(0, 2).toLowerCase();
-    const defaultLang = description[browserLang] ? browserLang : (description['en'] ? 'en' : Object.keys(description)[0]);
+    // Default the description to the chosen UI language when available
+    const uiLang = I18N.getLang();
+    const defaultLang = description[uiLang] ? uiLang : (description['en'] ? 'en' : Object.keys(description)[0]);
 
     // Display description in default language
     displayDescription(defaultLang);
@@ -504,7 +521,7 @@ function displayCompanyInfo(data) {
   if (data.data_updated_date) {
     document.getElementById('data-info-row').style.display = 'block';
     const date = new Date(data.data_updated_date);
-    document.getElementById('data-updated-value').textContent = `Data updated: ${date.toLocaleDateString()}`;
+    document.getElementById('data-updated-value').textContent = `${I18N.t('data_updated')}: ${date.toLocaleDateString()}`;
   }
 }
 

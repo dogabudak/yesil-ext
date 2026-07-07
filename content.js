@@ -141,6 +141,7 @@ function getThemeColors(selectedCampaign) {
 }
 
 async function checkWebsiteAndShowInfo() {
+  await I18N.load();
   const currentDomain = location.hostname.replace('www.', '');
 
   // Check if always-on mode is enabled and get campaign selection
@@ -159,6 +160,10 @@ async function checkWebsiteAndShowInfo() {
 // Re-render overlay when campaign selection changes
 chrome.storage.onChanged.addListener((changes, areaName) => {
   if (areaName === 'sync' && changes.selectedCampaign) {
+    checkWebsiteAndShowInfo();
+  }
+  // Re-render the overlay if the UI language was changed from the popup
+  if (areaName === 'local' && changes[I18N.STORAGE_KEY]) {
     checkWebsiteAndShowInfo();
   }
 });
@@ -181,8 +186,8 @@ function createWebsiteInfoPopup(companyInfo, selectedCampaign) {
     if (alternatives.length > 0) {
       alternativesHtml = `
         <div class="gs-alternatives-section">
-          <h3 class="gs-section-title">🌱 Green Alternatives</h3>
-          <p class="gs-alternatives-subtitle">Consider these carbon-neutral options:</p>
+          <h3 class="gs-section-title">${I18N.t('section_alternatives')}</h3>
+          <p class="gs-alternatives-subtitle">${I18N.t('alternatives_subtitle')}</p>
           <div class="gs-alternatives-list">
             ${alternatives.map(alt => `
               <div class="gs-alt-card">
@@ -190,7 +195,7 @@ function createWebsiteInfoPopup(companyInfo, selectedCampaign) {
                   <div class="gs-alt-name">${alt.name}</div>
                   <div class="gs-alt-description">${alt.description || ''}</div>
                 </div>
-                <a href="${alt.url}" target="_blank" class="gs-alt-visit-btn">Visit</a>
+                <a href="${alt.url}" target="_blank" class="gs-alt-visit-btn">${I18N.t('btn_visit')}</a>
               </div>
             `).join('')}
           </div>
@@ -448,7 +453,7 @@ function createWebsiteInfoPopup(companyInfo, selectedCampaign) {
             ${countryFlag ? `<div class="gs-country-flag">${countryFlag}</div>` : ''}
           </div>
           <div class="gs-carbon-badge ${isCarbon ? 'positive' : 'negative'}">
-            ${isCarbon ? '✓ Carbon Neutral' : '✗ Not Carbon Neutral'}
+            ${isCarbon ? '✓ ' + I18N.t('badge_carbon_neutral') : '✗ ' + I18N.t('badge_not_carbon_neutral')}
           </div>
         </div>
 
@@ -456,22 +461,22 @@ function createWebsiteInfoPopup(companyInfo, selectedCampaign) {
           <div class="gs-info-card">
             <div class="gs-info-card-icon">🏢</div>
             <div>
-              <div class="gs-info-card-label">Sector</div>
-              <div class="gs-info-card-value">${companyInfo.sector || 'N/A'}</div>
+              <div class="gs-info-card-label">${I18N.t('label_sector')}</div>
+              <div class="gs-info-card-value">${companyInfo.sector || I18N.t('na')}</div>
             </div>
           </div>
           <div class="gs-info-card">
             <div class="gs-info-card-icon">📍</div>
             <div>
-              <div class="gs-info-card-label">Headquarters</div>
-              <div class="gs-info-card-value">${companyInfo.headquarters || 'N/A'}</div>
+              <div class="gs-info-card-label">${I18N.t('label_headquarters')}</div>
+              <div class="gs-info-card-value">${companyInfo.headquarters || I18N.t('na')}</div>
             </div>
           </div>
           ${companyInfo.origin ? `
           <div class="gs-info-card">
             <div class="gs-info-card-icon">${countryFlag}</div>
             <div>
-              <div class="gs-info-card-label">Country of Origin</div>
+              <div class="gs-info-card-label">${I18N.t('label_origin')}</div>
               <div class="gs-info-card-value">${companyInfo.origin}</div>
             </div>
           </div>
@@ -480,7 +485,7 @@ function createWebsiteInfoPopup(companyInfo, selectedCampaign) {
           <div class="gs-info-card">
             <div class="gs-info-card-icon">🏛️</div>
             <div>
-              <div class="gs-info-card-label">Parent Company</div>
+              <div class="gs-info-card-label">${I18N.t('label_parent')}</div>
               <div class="gs-info-card-value">${companyInfo.parent}</div>
             </div>
           </div>
@@ -488,14 +493,14 @@ function createWebsiteInfoPopup(companyInfo, selectedCampaign) {
         </div>
 
         <div class="gs-sustainability-section">
-          <h3 class="gs-section-title">Sustainability</h3>
+          <h3 class="gs-section-title">${I18N.t('section_sustainability')}</h3>
           <div class="gs-meter-row">
-            <span class="gs-meter-label">Carbon Neutral</span>
-            <span class="gs-meter-value">${isCarbon ? '✅ Yes' : '❌ No'}</span>
+            <span class="gs-meter-label">${I18N.t('meter_carbon_neutral')}</span>
+            <span class="gs-meter-value">${isCarbon ? '✅ ' + I18N.t('value_yes') : '❌ ' + I18N.t('value_no')}</span>
           </div>
           ${companyInfo.renewable_share_percent ? `
           <div class="gs-meter-row">
-            <span class="gs-meter-label">Renewable Energy</span>
+            <span class="gs-meter-label">${I18N.t('meter_renewable')}</span>
             <div class="gs-progress-bar-container">
               <div class="gs-progress-bar" style="width: ${companyInfo.renewable_share_percent}%"></div>
             </div>
@@ -510,7 +515,7 @@ function createWebsiteInfoPopup(companyInfo, selectedCampaign) {
 
         ${alternativesHtml}
 
-        ${companyInfo.data_updated_date ? `<div class="gs-data-info">Data updated: ${new Date(companyInfo.data_updated_date).toLocaleDateString()}</div>` : ''}
+        ${companyInfo.data_updated_date ? `<div class="gs-data-info">${I18N.t('data_updated')}: ${new Date(companyInfo.data_updated_date).toLocaleDateString()}</div>` : ''}
       </div>
     </div>
   `;
@@ -550,7 +555,7 @@ function generateCertificationsHtml(documents) {
 
   return `
     <div class="gs-certifications-section">
-      <h3 class="gs-section-title">Certifications</h3>
+      <h3 class="gs-section-title">${I18N.t('section_certifications')}</h3>
       <div class="gs-cert-list">${badges}</div>
     </div>
   `;
@@ -564,9 +569,9 @@ function generateDescriptionHtml(description) {
   const availableLangs = Object.keys(description);
   if (availableLangs.length === 0) return '';
 
-  // Detect browser language or default to 'en'
-  const browserLang = navigator.language.slice(0, 2).toLowerCase();
-  const defaultLang = description[browserLang] ? browserLang : (description['en'] ? 'en' : availableLangs[0]);
+  // Default the description to the chosen UI language when available
+  const uiLang = I18N.getLang();
+  const defaultLang = description[uiLang] ? uiLang : (description['en'] ? 'en' : availableLangs[0]);
 
   // Get initial description text
   let descText = description[defaultLang] || '';
@@ -583,7 +588,7 @@ function generateDescriptionHtml(description) {
   return `
     <div class="gs-description-section">
       <div class="gs-description-header">
-        <h3 class="gs-section-title">About</h3>
+        <h3 class="gs-section-title">${I18N.t('section_about')}</h3>
         <div class="gs-lang-selector">${langButtons}</div>
       </div>
       <div class="gs-description-content" id="gs-description-text">${descText.replace(/\n/g, '<br>')}</div>
@@ -692,16 +697,16 @@ function createUnknownGreenScorePopup(domain, selectedCampaign) {
       </div>
       <div class="gs-content">
         <div class="gs-no-data-icon">🔍</div>
-        <h2 class="gs-no-data-title">No Data Available</h2>
+        <h2 class="gs-no-data-title">${I18N.t('no_data_title')}</h2>
         <p class="gs-no-data-domain">${domain}</p>
-        <p class="gs-no-data-text">We don't have sustainability information for this website yet.</p>
+        <p class="gs-no-data-text">${I18N.t('no_data_text')}</p>
 
         <div class="gs-help-card">
-          <div class="gs-help-title">💡 Help us improve</div>
-          <div class="gs-help-text">If you know about this company's sustainability practices, consider contributing to our database.</div>
+          <div class="gs-help-title">${I18N.t('help_title')}</div>
+          <div class="gs-help-text">${I18N.t('help_text')}</div>
         </div>
 
-        <div class="gs-footer">Always-on mode is enabled</div>
+        <div class="gs-footer">${I18N.t('always_on_enabled')}</div>
       </div>
     </div>
   `;
