@@ -390,7 +390,24 @@ body {
   color: #999;
   text-align: center;
   line-height: 1.5;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+}
+
+.request-recorded-info {
+  font-size: 12px;
+  color: #2e7d32;
+  text-align: center;
+  margin: 0 16px 16px;
+  padding: 12px;
+  background: rgba(46, 125, 50, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(46, 125, 50, 0.2);
+  line-height: 1.4;
+}
+
+.request-check {
+  font-weight: bold;
+  margin-right: 6px;
 }
 
 /* Tab Navigation */

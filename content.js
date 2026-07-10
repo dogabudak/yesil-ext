@@ -685,6 +685,16 @@ function createUnknownGreenScorePopup(domain, selectedCampaign) {
       }
       #website-info-popup .gs-help-title { font-size: 12px; font-weight: 600; color: ${theme.primary}; margin-bottom: 6px; }
       #website-info-popup .gs-help-text { font-size: 11px; color: #666; line-height: 1.4; }
+      #website-info-popup .gs-request-info {
+        background: rgba(46, 125, 50, 0.1);
+        border: 1px solid rgba(46, 125, 50, 0.2);
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin-bottom: 12px;
+        text-align: center;
+      }
+      #website-info-popup .gs-request-check { color: #2e7d32; font-weight: bold; margin-right: 6px; }
+      #website-info-popup .gs-request-text { font-size: 11px; color: #2e7d32; line-height: 1.4; }
       #website-info-popup .gs-footer { font-size: 10px; color: #aaa; font-style: italic; text-align: center; margin-top: 12px; }
     </style>
     <div class="gs-container">
@@ -700,6 +710,11 @@ function createUnknownGreenScorePopup(domain, selectedCampaign) {
         <h2 class="gs-no-data-title">${I18N.t('no_data_title')}</h2>
         <p class="gs-no-data-domain">${domain}</p>
         <p class="gs-no-data-text">${I18N.t('no_data_text')}</p>
+
+        <div class="gs-request-info">
+          <span class="gs-request-check">✓</span>
+          <span class="gs-request-text">${I18N.t('request_recorded')}</span>
+        </div>
 
         <div class="gs-help-card">
           <div class="gs-help-title">${I18N.t('help_title')}</div>

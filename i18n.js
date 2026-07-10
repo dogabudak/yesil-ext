@@ -63,7 +63,8 @@ const I18N = {
       help_title: '💡 Gelişmemize yardımcı olun',
       help_text: 'Bu şirketin sürdürülebilirlik uygulamaları hakkında bilgiye sahipseniz, veritabanımıza katkıda bulunmayı düşünün.',
       always_on_enabled: 'Her zaman açık mod etkin',
-      lang_label: 'Dil'
+      lang_label: 'Dil',
+      request_recorded: 'Talebiniz kaydedildi! Ekibimiz bu şirketin sürdürülebilirlik verilerini araştıracak.'
     },
     en: {
       tab_score: 'Score',
@@ -120,7 +121,8 @@ const I18N = {
       help_title: '💡 Help us improve',
       help_text: "If you know about this company's sustainability practices, consider contributing to our database.",
       always_on_enabled: 'Always-on mode is enabled',
-      lang_label: 'Language'
+      lang_label: 'Language',
+      request_recorded: 'Request recorded! Our team will research this company\'s sustainability data.'
     },
     de: {
       tab_score: 'Score',
@@ -177,7 +179,8 @@ const I18N = {
       help_title: '💡 Helfen Sie uns, besser zu werden',
       help_text: 'Wenn Sie die Nachhaltigkeitspraktiken dieses Unternehmens kennen, tragen Sie zu unserer Datenbank bei.',
       always_on_enabled: 'Immer-an-Modus ist aktiviert',
-      lang_label: 'Sprache'
+      lang_label: 'Sprache',
+      request_recorded: 'Anfrage gespeichert! Unser Team wird die Nachhaltigkeitsdaten dieses Unternehmens recherchieren.'
     }
   },
 
