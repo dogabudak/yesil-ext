@@ -3,7 +3,7 @@ const CONFIG = {
   // Backend API configuration
   API_BASE_URL: 'https://yesildoga-api.onrender.com',
   AUTH_BASE_URL: 'https://piarch-a-token-rs.onrender.com',
-  USER_BASE_URL: 'http://localhost:3020', // TODO: Deploy user service to Render and update this URL
+  USER_BASE_URL: 'https://piarch-a-user.onrender.com',
   API_ENDPOINTS: {
     COMPANIES: '/api/companies',
     SEARCH: '/api/companies/search',
