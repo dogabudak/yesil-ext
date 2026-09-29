@@ -109,16 +109,28 @@ Questions or a company you'd like us to add? Reach us at the support email on th
 | `host_permissions: <all_urls>` | The extension's core purpose is to work on **any** website the user visits — it must inject the overlay and read the current domain regardless of site. It does not read page content or user data; it only uses the domain to query public company data. |
 
 ### Remote code
-> **No**, the extension does not use remote code. All logic ships in the package. It only makes data (fetch) requests to its own backend API (`https://yesildoga-api.onrender.com`).
+> **No**, the extension does not use remote code. All logic ships in the package. It makes data (fetch) requests only to its own backend API (`https://yesildoga-api.onrender.com`) and, if the Account tab ships, to Supabase Auth (`https://<project-ref>.supabase.co`).
 
 ### Data usage disclosures (what you check on the form)
-- **Does this extension collect user data?** Yes (technically — the domain of visited sites is sent to the API).
-- Data types to declare:
-  - **Web history** → the current site's domain is sent to the API for lookup. *(Not stored server-side beyond aggregate failed-lookup analytics; disclose honestly.)*
-  - Do **NOT** check: personally identifiable info, financial info, health, location, authentication (unless the Account/login tab ships — see note below).
-- Certify: data is **not** sold to third parties, **not** used for unrelated purposes, **not** used for creditworthiness/lending.
+These must agree with `/privacy`, which was rewritten 2026-09-11 against the real data flows.
+Section numbers below refer to that page.
 
-> ⚠️ If the login/signup Account tab ships in v1, you must additionally disclose **authentication information** and describe the auth flow. Simpler to hide the Account tab for v1.
+- **Does this extension collect user data?** Yes.
+- Data types to declare:
+  - **Web history** → the active tab's domain is sent to the API for lookup (§2). Note that a
+    domain we have *no* data for is **stored server-side** in `CompanyRequest` with a request
+    counter (§4) — not linked to any user, but it is retention, so declare web history rather
+    than treating the lookup as transient.
+  - **Personally identifiable information** *(only if the Account tab ships)* → email address (§3).
+  - **Authentication information** *(only if the Account tab ships)* → password at signup, plus
+    access/refresh tokens held in `chrome.storage.local` (§3).
+  - Do **NOT** check: financial info, health, location, personal communications, user activity.
+- Certify: data is **not** sold to third parties, **not** used for unrelated purposes, **not** used
+  for creditworthiness/lending.
+
+> ⚠️ **The v1 auth fork.** Hiding the Account tab for v1 keeps the declaration to web history alone
+> and is still the simpler path. `/privacy` is written to be accurate either way — it describes the
+> account as optional — so this is a store-form decision, not a rewrite trigger.
 
 ### Privacy policy URL
 > https://yesildoga.onrender.com/privacy

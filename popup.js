@@ -91,14 +91,53 @@ function setupTabNavigation() {
 }
 
 // Auth
+const AUTH_KEYS = ['authToken', 'refreshToken', 'authExpiresAt', 'email', 'userId', 'authProvider', 'authTimestamp'];
+
+async function persistSession(session) {
+  const authData = {
+    authToken: session.accessToken,
+    refreshToken: session.refreshToken,
+    authExpiresAt: session.expiresAt,
+    email: session.email,
+    userId: session.userId,
+    authProvider: 'supabase',
+    authTimestamp: Date.now()
+  };
+
+  await chrome.storage.local.set(authData);
+
+  return authData;
+}
+
 async function checkAuthState() {
   try {
-    const authData = await chrome.storage.local.get(['authToken', 'username', 'authProvider', 'authTimestamp']);
-    if (authData.authToken) {
-      showProfileView(authData);
-    } else {
+    const authData = await chrome.storage.local.get(AUTH_KEYS);
+
+    if (!authData.authToken) {
       showLoginView();
+      return;
     }
+
+    // Access tokens are short-lived (1h by default), so a popup opened the next
+    // day holds an expired one. Trade the refresh token for a fresh session.
+    const isExpired = !authData.authExpiresAt || Date.now() >= authData.authExpiresAt - 60000;
+
+    if (isExpired && authData.refreshToken) {
+      const response = await chrome.runtime.sendMessage({
+        action: 'refreshSession',
+        refreshToken: authData.refreshToken
+      });
+
+      if (response && response.session) {
+        showProfileView(await persistSession(response.session));
+      } else {
+        await chrome.storage.local.remove(AUTH_KEYS);
+        showLoginView();
+      }
+      return;
+    }
+
+    showProfileView(authData);
   } catch (error) {
     console.error('Error checking auth state:', error);
     showLoginView();
@@ -136,12 +175,14 @@ function showProfileView(authData) {
   document.getElementById('account-login-view').style.display = 'none';
   document.getElementById('account-profile-view').style.display = 'block';
 
-  const username = authData.username || 'User';
+  const email = authData.email || 'User';
+  // Supabase has no username field, so the local part of the email stands in.
+  const displayName = email.split('@')[0];
 
-  document.getElementById('profile-avatar-text').textContent = username.charAt(0).toUpperCase();
-  document.getElementById('profile-name').textContent = username;
-  document.getElementById('profile-email').textContent = username;
-  document.getElementById('profile-provider').textContent = I18N.t('provider_username_password');
+  document.getElementById('profile-avatar-text').textContent = displayName.charAt(0).toUpperCase();
+  document.getElementById('profile-name').textContent = displayName;
+  document.getElementById('profile-email').textContent = email;
+  document.getElementById('profile-provider').textContent = I18N.t('provider_email');
 
   if (authData.authTimestamp) {
     document.getElementById('profile-member-since').textContent = new Date(authData.authTimestamp).toLocaleDateString();
@@ -162,25 +203,30 @@ function setupLoginListeners() {
   // Login form
   document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const username = document.getElementById('login-username').value.trim();
+    const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
-    if (!username || !password) return;
-    await handleLogin(username, password);
+    if (!email || !password) return;
+    await handleLogin(email, password);
   });
 
   // Signup form
   document.getElementById('signup-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const username = document.getElementById('signup-username').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
     const password = document.getElementById('signup-password').value;
     const confirmPassword = document.getElementById('signup-confirm-password').value;
 
-    if (!username || !password) return;
+    if (!email || !password) return;
     if (password !== confirmPassword) {
       showAuthError(I18N.t('err_passwords_no_match'));
       return;
     }
-    await handleSignup(username, password);
+    // Supabase rejects anything shorter, but failing here keeps the round trip off the wire.
+    if (password.length < 6) {
+      showAuthError(I18N.t('err_password_too_short'));
+      return;
+    }
+    await handleSignup(email, password);
   });
 
   // Toggle login/signup
@@ -194,12 +240,12 @@ function setupLoginListeners() {
   document.getElementById('logout-btn').addEventListener('click', handleLogout);
 }
 
-async function handleLogin(username, password) {
+async function handleLogin(email, password) {
   hideAuthError();
   try {
     const response = await chrome.runtime.sendMessage({
       action: 'loginUser',
-      username,
+      email,
       password
     });
 
@@ -208,26 +254,19 @@ async function handleLogin(username, password) {
       return;
     }
 
-    const authData = {
-      authToken: response.token,
-      username: username,
-      authProvider: 'username',
-      authTimestamp: Date.now()
-    };
-    await chrome.storage.local.set(authData);
-    showProfileView(authData);
+    showProfileView(await persistSession(response.session));
   } catch (error) {
     console.error('Login error:', error);
     showAuthError(I18N.t('err_login_failed'));
   }
 }
 
-async function handleSignup(username, password) {
+async function handleSignup(email, password) {
   hideAuthError();
   try {
     const response = await chrome.runtime.sendMessage({
       action: 'signupUser',
-      username,
+      email,
       password
     });
 
@@ -236,8 +275,15 @@ async function handleSignup(username, password) {
       return;
     }
 
-    // Auto-login after successful signup
-    await handleLogin(username, password);
+    // "Confirm email" is on: there is no session yet, so send them to their inbox
+    // rather than to a login attempt that would fail.
+    if (response.confirmationRequired) {
+      showAuthForm('login');
+      showAuthError(I18N.t('msg_confirm_email'));
+      return;
+    }
+
+    showProfileView(await persistSession(response.session));
   } catch (error) {
     console.error('Signup error:', error);
     showAuthError(I18N.t('err_signup_failed'));
@@ -246,11 +292,16 @@ async function handleSignup(username, password) {
 
 async function handleLogout() {
   try {
-    await chrome.storage.local.remove(['authToken', 'username', 'authProvider', 'authTimestamp']);
-    showLoginView();
+    const { authToken } = await chrome.storage.local.get(['authToken']);
+
+    // Revoke the refresh token server-side so it cannot outlive the local session.
+    if (authToken) {
+      await chrome.runtime.sendMessage({ action: 'logoutUser', accessToken: authToken });
+    }
   } catch (error) {
     console.error('Logout error:', error);
-    await chrome.storage.local.remove(['authToken', 'username', 'authProvider', 'authTimestamp']);
+  } finally {
+    await chrome.storage.local.remove(AUTH_KEYS);
     showLoginView();
   }
 }

@@ -2,8 +2,23 @@
 const CONFIG = {
   // Backend API configuration
   API_BASE_URL: 'https://yesildoga-api.onrender.com',
-  AUTH_BASE_URL: 'https://piarch-a-token-rs.onrender.com',
-  USER_BASE_URL: 'https://piarch-a-user.onrender.com',
+
+  // Supabase Auth (GoTrue). Replaces the piarch-a-token-rs and piarch-a-user services.
+  //
+  // SUPABASE_ANON_KEY must be the *anon/publishable* key, never the service_role key —
+  // this file ships inside the extension and is readable by anyone who installs it.
+  // The anon key is designed to be public and is constrained by row-level security.
+  //
+  // TODO: fill both in from Supabase dashboard → Project Settings → API.
+  SUPABASE_URL: 'https://YOUR_PROJECT_REF.supabase.co',
+  SUPABASE_ANON_KEY: 'YOUR_SUPABASE_ANON_KEY',
+  AUTH_ENDPOINTS: {
+    SIGNUP: '/auth/v1/signup',
+    TOKEN: '/auth/v1/token',
+    LOGOUT: '/auth/v1/logout',
+    USER: '/auth/v1/user'
+  },
+
   API_ENDPOINTS: {
     COMPANIES: '/api/companies',
     SEARCH: '/api/companies/search',
