@@ -1,17 +1,7 @@
-// Configuration file for Chrome extension
 const CONFIG = {
-  // Backend API configuration
   API_BASE_URL: 'https://yesildoga-api.onrender.com',
-
-  // Supabase Auth (GoTrue). Replaces the piarch-a-token-rs and piarch-a-user services.
-  //
-  // SUPABASE_ANON_KEY must be the *anon/publishable* key, never the service_role key —
-  // this file ships inside the extension and is readable by anyone who installs it.
-  // The anon key is designed to be public and is constrained by row-level security.
-  //
-  // TODO: fill both in from Supabase dashboard → Project Settings → API.
-  SUPABASE_URL: 'https://YOUR_PROJECT_REF.supabase.co',
-  SUPABASE_ANON_KEY: 'YOUR_SUPABASE_ANON_KEY',
+  SUPABASE_URL: 'https://epevkhrxjkhhlgovyfhv.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVwZXZraHJ4amtoaGxnb3Z5Zmh2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUwNDg5NDksImV4cCI6MjA4MDYyNDk0OX0.BGsvQg2saVDeoV39kU6kporlk8Q1WvVoySHXbA76xIE',
   AUTH_ENDPOINTS: {
     SIGNUP: '/auth/v1/signup',
     TOKEN: '/auth/v1/token',
