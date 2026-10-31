@@ -22,10 +22,9 @@ Chrome extension that displays sustainability scores and environmental data for 
 ## Technical Details
 
 ### Permissions Required
-- `storage`: Cache API responses and user preferences
-- `activeTab`: Access current tab URL for domain lookup
-- `tabs`: Detect tab navigation to trigger lookups
-- `<all_urls>` (host permission): Needed to inject content script and fetch company data on any website
+- `storage`: Cache API responses, user preferences, and the auth session
+- `<all_urls>` (host permission): Needed to inject content script and fetch company data on any website; also what lets `chrome.tabs.query` in the popup see the active tab's URL
+- No `activeTab` / `tabs` (removed 2026-10-31 — unused, and unused permissions risk Web Store rejection). Do not re-add them without a real API call that needs them, and update the justification table in `STORE_SUBMISSION.md` and §11 of `/privacy` together
 
 ### Data Storage
 - **Local Storage**: Cached API responses (24-hour expiration via `CONFIG.CACHE_DURATION`)
@@ -72,5 +71,5 @@ Chrome extension that displays sustainability scores and environmental data for 
 ### Security Considerations
 - Requires `<all_urls>` host permission to function on any website
 - No user tracking — only fetches company data by domain
-- No cookies, no visit history, no personal data collection
+- No cookies, no visit history. The only personal data is the optional account's email address (Supabase Auth), plus the session tokens kept in `chrome.storage.local`
 - Content script injects UI overlay only (no page modification)

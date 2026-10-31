@@ -176,12 +176,15 @@ function createWebsiteInfoPopup(companyInfo, selectedCampaign) {
   }
 
   const theme = getThemeColors(selectedCampaign);
-  const isCarbon = companyInfo.carbon_neutral;
+  // null = not researched yet: show no carbon label at all rather than a guessed "no"
+  const hasCarbonData = typeof companyInfo.carbon_neutral === 'boolean';
+  const isCarbon = companyInfo.carbon_neutral === true;
+  const hasRenewableData = companyInfo.renewable_share_percent != null;
   const countryFlag = getCountryEmoji(companyInfo.origin);
 
-  // Get carbon neutral alternatives if the company is not carbon neutral
+  // Get carbon neutral alternatives if the company is known not to be carbon neutral
   let alternativesHtml = '';
-  if (!isCarbon) {
+  if (companyInfo.carbon_neutral === false) {
     const alternatives = getCarbonNeutralAlternatives(companyInfo);
     if (alternatives.length > 0) {
       alternativesHtml = `
@@ -452,9 +455,11 @@ function createWebsiteInfoPopup(companyInfo, selectedCampaign) {
             </div>
             ${countryFlag ? `<div class="gs-country-flag">${countryFlag}</div>` : ''}
           </div>
+          ${hasCarbonData ? `
           <div class="gs-carbon-badge ${isCarbon ? 'positive' : 'negative'}">
             ${isCarbon ? '✓ ' + I18N.t('badge_carbon_neutral') : '✗ ' + I18N.t('badge_not_carbon_neutral')}
           </div>
+          ` : ''}
         </div>
 
         <div class="gs-info-grid">
@@ -492,13 +497,16 @@ function createWebsiteInfoPopup(companyInfo, selectedCampaign) {
           ` : ''}
         </div>
 
+        ${hasCarbonData || hasRenewableData ? `
         <div class="gs-sustainability-section">
           <h3 class="gs-section-title">${I18N.t('section_sustainability')}</h3>
+          ${hasCarbonData ? `
           <div class="gs-meter-row">
             <span class="gs-meter-label">${I18N.t('meter_carbon_neutral')}</span>
             <span class="gs-meter-value">${isCarbon ? '✅ ' + I18N.t('value_yes') : '❌ ' + I18N.t('value_no')}</span>
           </div>
-          ${companyInfo.renewable_share_percent ? `
+          ` : ''}
+          ${hasRenewableData ? `
           <div class="gs-meter-row">
             <span class="gs-meter-label">${I18N.t('meter_renewable')}</span>
             <div class="gs-progress-bar-container">
@@ -508,6 +516,7 @@ function createWebsiteInfoPopup(companyInfo, selectedCampaign) {
           </div>
           ` : ''}
         </div>
+        ` : ''}
 
         ${generateCertificationsHtml(companyInfo.documents)}
 

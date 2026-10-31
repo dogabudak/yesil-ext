@@ -35,7 +35,7 @@ YesilDoga Green Score, gezindiğiniz web sitelerinin arkasındaki şirketlerin �
 NE YAPAR
 Herhangi bir web sitesini ziyaret edin; YesilDoga alan adının arkasındaki şirketi tanır ve sürdürülebilirlik profilini sade bir pencerede sunar:
 
-• Karbon nötr durumu — net bir evet/hayır rozeti
+• Karbon nötr durumu — araştırdığımız şirketler için net bir evet/hayır rozeti
 • Yenilenebilir enerji kullanımı — ilerleme çubuğuyla yüzde olarak
 • Şirket bilgileri — sektör, merkez ve ülke
 • Sertifikalar — ISO, CE ve diğer çevresel belgeler
@@ -71,7 +71,7 @@ YesilDoga Green Score shows you the environmental footprint of the companies beh
 WHAT IT DOES
 Visit any website and YesilDoga identifies the company behind the domain, then surfaces its sustainability profile in a clean overlay:
 
-• Carbon-neutral status — a clear yes/no badge
+• Carbon-neutral status — a clear yes/no badge for the companies we have researched
 • Renewable energy usage — shown as a percentage with a progress bar
 • Company details — sector, headquarters, and country
 • Certifications — ISO, CE, and other environmental credentials
@@ -104,12 +104,13 @@ Questions or a company you'd like us to add? Reach us at the support email on th
 | Permission | Justification |
 |---|---|
 | `storage` | Cache company sustainability data locally for 24 hours and store the user's selected campaign/preferences, avoiding repeat API calls. |
-| `activeTab` | Read the domain of the current tab to look up the associated company. |
-| `tabs` | Detect tab navigation and URL changes so the sustainability overlay updates when the user moves to a new site. |
-| `host_permissions: <all_urls>` | The extension's core purpose is to work on **any** website the user visits — it must inject the overlay and read the current domain regardless of site. It does not read page content or user data; it only uses the domain to query public company data. |
+| `host_permissions: <all_urls>` | The extension's core purpose is to work on **any** website the user visits — it must inject the overlay and read the current tab's domain regardless of site. It does not read page content or user data; it only uses the domain to query public company data. |
+
+`activeTab` and `tabs` were removed on 2026-10-31: the only tabs API call (`chrome.tabs.query` in
+`popup.js`) gets the URL through `<all_urls>`, and nothing listens for tab events.
 
 ### Remote code
-> **No**, the extension does not use remote code. All logic ships in the package. It makes data (fetch) requests only to its own backend API (`https://yesildoga-api.onrender.com`) and, if the Account tab ships, to Supabase Auth (`https://<project-ref>.supabase.co`).
+> **No**, the extension does not use remote code. All logic ships in the package. It makes data (fetch) requests only to its own backend API (`https://yesildoga-api.onrender.com`) and, for the optional account, to Supabase Auth (`https://epevkhrxjkhhlgovyfhv.supabase.co`).
 
 ### Data usage disclosures (what you check on the form)
 These must agree with `/privacy`, which was rewritten 2026-09-11 against the real data flows.
@@ -121,16 +122,15 @@ Section numbers below refer to that page.
     domain we have *no* data for is **stored server-side** in `CompanyRequest` with a request
     counter (§4) — not linked to any user, but it is retention, so declare web history rather
     than treating the lookup as transient.
-  - **Personally identifiable information** *(only if the Account tab ships)* → email address (§3).
-  - **Authentication information** *(only if the Account tab ships)* → password at signup, plus
-    access/refresh tokens held in `chrome.storage.local` (§3).
+  - **Personally identifiable information** → email address, for the optional account (§3).
+  - **Authentication information** → password at signup, plus access/refresh tokens held in
+    `chrome.storage.local` (§3).
   - Do **NOT** check: financial info, health, location, personal communications, user activity.
 - Certify: data is **not** sold to third parties, **not** used for unrelated purposes, **not** used
   for creditworthiness/lending.
 
-> ⚠️ **The v1 auth fork.** Hiding the Account tab for v1 keeps the declaration to web history alone
-> and is still the simpler path. `/privacy` is written to be accurate either way — it describes the
-> account as optional — so this is a store-form decision, not a rewrite trigger.
+> **The Account tab ships in v1** (decided 2026-10-31), so all three types above are declared.
+> `/privacy` already describes the account as optional and matches this.
 
 ### Privacy policy URL
 > https://yesildoga.onrender.com/privacy
@@ -160,8 +160,11 @@ Section numbers below refer to that page.
 ---
 
 ## ⛔ Blockers before you can submit
-1. **`config.js` `USER_BASE_URL` = `http://localhost:3020`** — signup/login fails for reviewers. Deploy the user service OR hide the Account tab for v1.
-2. **QA pass** — test overlay on 30+ sites, error states, no console errors (MVP_PLAN Step 3).
+1. **Account tab end-to-end test** — signup → confirm email → login → session refresh → logout,
+   run from the extension against the live Supabase project, after pointing Supabase's Site URL at a
+   real page (`MVP_PLAN.md` C1–C2). Reviewers will try this tab. Make sure the Supabase project is awake while
+   the submission is in review.
+2. **QA pass** — test overlay on 30+ sites, error states, no console errors (`MVP_PLAN.md` E2–E3).
 
 ---
 

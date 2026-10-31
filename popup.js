@@ -464,10 +464,14 @@ function displayCompanyInfo(data) {
   const leafIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8a8 8 0 0 1-10 10Z"/><path d="M11 20c-1.2 0-2 0-2-1.33s.8-2.67 2-4V20Z"/></svg>`;
   const cloudIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a5.5 5.5 0 0 0 0-11h-1.3a8 8 0 1 0-14.5 4.5"/><path d="m11 13 3 3-3 3"/><path d="m11 16h9"/></svg>`;
 
-  if (data.carbon_neutral) {
+  // null = not researched yet: show no carbon label at all rather than a guessed "no"
+  const hasCarbonData = typeof data.carbon_neutral === 'boolean';
+  const hasRenewableData = data.renewable_share_percent != null;
+  badge.style.display = hasCarbonData ? '' : 'none';
+  if (data.carbon_neutral === true) {
     badge.className = 'carbon-badge positive';
     badge.innerHTML = `${leafIcon} <span>${escapeHtml(I18N.t('badge_carbon_neutral'))}</span>`;
-  } else {
+  } else if (data.carbon_neutral === false) {
     badge.className = 'carbon-badge negative';
     badge.innerHTML = `${cloudIcon} <span>${escapeHtml(I18N.t('badge_not_carbon_neutral'))}</span>`;
   }
@@ -494,17 +498,20 @@ function displayCompanyInfo(data) {
   }
 
   // Carbon neutral value
+  document.getElementById('sustainability-section').style.display =
+    hasCarbonData || hasRenewableData ? '' : 'none';
+  document.getElementById('carbon-neutral-row').style.display = hasCarbonData ? '' : 'none';
   const cnValue = document.getElementById('carbon-neutral-value');
-  if (data.carbon_neutral) {
+  if (data.carbon_neutral === true) {
     cnValue.textContent = `✅ ${I18N.t('value_yes')}`;
     cnValue.style.color = '#28a745';
-  } else {
+  } else if (data.carbon_neutral === false) {
     cnValue.textContent = `❌ ${I18N.t('value_no')}`;
     cnValue.style.color = '#dc3545';
   }
 
   // Renewable energy bar
-  if (data.renewable_share_percent != null) {
+  if (hasRenewableData) {
     document.getElementById('renewable-row').style.display = 'flex';
     const pct = Math.min(100, Math.max(0, data.renewable_share_percent));
     document.getElementById('renewable-bar').style.width = pct + '%';
@@ -513,7 +520,7 @@ function displayCompanyInfo(data) {
 
   // Alternatives
   const alternatives = data.carbon_neutral_alternatives || [];
-  if (!data.carbon_neutral && alternatives.length > 0) {
+  if (data.carbon_neutral === false && alternatives.length > 0) {
     document.getElementById('alternatives-section').style.display = 'block';
     const list = document.getElementById('alternatives-list');
     list.innerHTML = alternatives.map(alt => `

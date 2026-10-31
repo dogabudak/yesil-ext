@@ -4,9 +4,7 @@
   "version": "1.0.0",
   "description": "See the sustainability score of any website you visit",
   "permissions": [
-    "storage",
-    "activeTab",
-    "tabs"
+    "storage"
   ],
   "host_permissions": [
     "<all_urls>"
