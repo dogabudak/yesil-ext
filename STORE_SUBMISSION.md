@@ -161,8 +161,8 @@ Section numbers below refer to that page.
 
 ## ⛔ Blockers before you can submit
 1. **Account tab end-to-end test** — signup → confirm email → login → session refresh → logout,
-   run from the extension against the live Supabase project, after pointing Supabase's Site URL at a
-   real page (`MVP_PLAN.md` C1–C2). Reviewers will try this tab. Make sure the Supabase project is awake while
+   run from the extension against the live Supabase project (`MVP_PLAN.md` C2; the Site URL points at
+   `https://yesildoga.onrender.com` since 2026-10-31). Reviewers will try this tab. Make sure the Supabase project is awake while
    the submission is in review.
 2. **QA pass** — test overlay on 30+ sites, error states, no console errors (`MVP_PLAN.md` E2–E3).
 
